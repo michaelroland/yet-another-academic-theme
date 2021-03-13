@@ -1,0 +1,47 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render list paginator.
+
+Context: The current content meta context of a bundle.
+
+*/ -}}
+{{- $paginator := .Page.Paginator -}}
+
+{{- if gt $paginator.TotalPages 1 -}}
+<nav class="pagination-bar" role="navigation" aria-label="{{ T "pagination_navigation"}}">
+    <ul class="pagination justify-content-center">
+        <li class="page-item{{ if not $paginator.HasPrev }} disabled{{ end }}">
+            <a class="page-link px-4" href="{{ if $paginator.HasPrev }}{{ $paginator.Prev.URL }}{{ else }}#{{ end }}" title="{{ T "previous_page" }}"><i class="fas fa-backward" aria-hidden="true"></i></a>
+        </li>
+        {{- $adjacent_links := 2 -}}
+        {{- $show_ellipsis := true -}}
+        {{- range $paginator.Pagers -}}
+            {{- $show_page := le .TotalPages ($adjacent_links | mul 2 | add 1) -}}
+            {{- $show_page = $show_page | or (le .PageNumber $adjacent_links) -}}
+            {{- $show_page = $show_page | or (lt (sub .TotalPages .PageNumber) $adjacent_links) -}}
+            {{- $show_page = $show_page | or (and (ge .PageNumber (sub $paginator.PageNumber $adjacent_links)) (le .PageNumber (add $paginator.PageNumber $adjacent_links))) -}}
+            {{- if $show_page -}}
+                {{- $show_ellipsis = true -}}
+        <li class="page-item{{ if eq . $paginator }} active{{ end }}">
+            <a class="px-3 page-link" href="{{ .URL }}">{{ .PageNumber }}</a>
+        </li>
+            {{- else if $show_ellipsis -}}
+                {{- $show_ellipsis = false -}}
+        <li class="page-item disabled">
+            <span class="page-link px-4"><i class="fas fa-ellipsis-h" aria-hidden="true"></i></span>
+        </li>
+            {{- end -}}
+        {{- end -}}
+        <li class="page-item{{ if not $paginator.HasNext }} disabled{{ end }}">
+            <a class="page-link px-4" href="{{ if $paginator.HasNext }}{{ $paginator.Next.URL }}{{ else }}#{{ end }}" title="{{ T "next_page" }}"><i class="fas fa-forward" aria-hidden="true"></i></a>
+        </li>
+    </ul>
+</nav>
+{{- end -}}

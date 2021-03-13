@@ -1,0 +1,61 @@
+## Theme configuration: V-Card
+## 
+##  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+##  
+##  This Source Code Form is subject to the terms of the Mozilla Public
+##  License, v. 2.0. If a copy of the MPL was not distributed with this
+##  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+## 
+
+portrait_size = 180
+portrait_small_size = 90
+portrait_small_breakpoint = "sm"
+portrait_name = "portrait.*"
+
+[[elements]]
+  type = "position"
+  is_url = false
+
+[[elements]]
+  type = "affiliation"
+  secondary = "_location"
+  icon = "fas fa-university"
+  is_url = false
+
+[[elements]]
+  type = "company"
+  secondary = "_location"
+  icon = "fas fa-industry"
+  is_url = false
+
+[[elements]]
+  type = "address"
+  icon = "fas fa-map-marker-alt"
+  is_url = false
+
+[[elements]]
+  type = "coordinates"
+  icon = "fas fa-location-arrow"
+  is_url = false
+
+[[elements]]
+  type = "url"
+  icon = "fas fa-link"
+  is_url = true
+
+[[elements]]
+  type = "phone"
+  icon = "fas fa-phone-alt"
+  is_url = true
+  url_prefix = "tel:"
+
+[[elements]]
+  type = "mail"
+  icon = "fas fa-envelope"
+  is_url = true
+  url_prefix = "mailto:"
+
+[[elements]]
+  type = "key"
+  icon = "fas fa-key"
+  is_url = false

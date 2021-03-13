@@ -1,0 +1,271 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render a publication entry.
+
+Param: Page       The current page context (may be omitted).
+Param: Entry      The page-meta object of the publication data entry.
+Param: Settings   Optional dict of local scope (e.g. shortcodes, previews) settings.
+
+Settings:
+    author_links
+    editor_links
+    advisor_links
+
+Page-level Params:
+    author_links
+    editor_links
+    advisor_links
+
+*/ -}}
+{{- $pubdata := .Entry -}}
+{{- $pubdata = merge $pubdata (dict "date" .Entry.Params.date "thedate" $pubdata.date) -}}
+
+{{- $editors := partial "function-process-authors" (dict "Authors" .Entry.Params.editor) -}}
+{{- $pubdata = merge $pubdata (dict "editors" $editors) -}}
+
+{{- $advisors := partial "function-process-authors" (dict "Authors" .Entry.Params.advisor) -}}
+{{- $pubdata = merge $pubdata (dict "advisors" $advisors) -}}
+
+{{- $author_links := false -}}
+{{- $editor_links := false -}}
+{{- $advisor_links := false -}}
+{{- with .Page -}}
+    {{- $author_links = .Param "author_links" | default $author_links -}}
+    {{- $editor_links = .Param "editor_links" | default $editor_links -}}
+    {{- $advisor_links = .Param "advisor_links" | default $advisor_links -}}
+{{- end -}}
+{{- with .Settings -}}
+    {{- if isset . "author_links" -}}
+        {{- $author_links = .author_links -}}
+    {{- end -}}
+    {{- if isset . "editor_links" -}}
+        {{- $editor_links = .editor_links -}}
+    {{- end -}}
+    {{- if isset . "advisor_links" -}}
+        {{- $advisor_links = .advisor_links -}}
+    {{- end -}}
+{{- end -}}
+{{- $pubdata = merge $pubdata (dict "author_links" $author_links "editor_links" $editor_links "advisor_links" $advisor_links) -}}
+
+{{- $citation_partial_name := "citation" -}}
+{{- $citation_partial      := $citation_partial_name -}}
+{{- $bibtex_partial_name   := "bibtex" -}}
+{{- $bibtex_partial        := $bibtex_partial_name -}}
+{{- range split (.Entry.Params.publication_type) ":" -}}
+    {{- $citation_partial_name = printf "%s-%s" $citation_partial_name . -}}
+    {{- $bibtex_partial_name   = printf "%s-%s" $bibtex_partial_name   . -}}
+    {{- if templates.Exists (printf "partials/%s.html" $citation_partial_name) -}}
+        {{- $citation_partial = $citation_partial_name -}}
+    {{- end -}}
+    {{- if templates.Exists (printf "partials/%s.html" $bibtex_partial_name) -}}
+        {{- $bibtex_partial = $bibtex_partial_name -}}
+    {{- end -}}
+{{- end -}}
+{{- $citation_subtype := $citation_partial_name | strings.TrimPrefix $citation_partial | strings.TrimPrefix "-" -}}
+{{- $bibtex_subtype := $bibtex_partial_name | strings.TrimPrefix $bibtex_partial | strings.TrimPrefix "-" -}}
+
+{{- $pages := split (.Entry.Params.pages) "--" -}}
+{{- if not $pages -}}
+    {{- $pages = slice "0" (.Entry.Params.numpages) -}}
+{{- end -}}
+{{- $pages_str := "" -}}
+{{- $page_range := false -}}
+{{- with index $pages 0 -}}
+    {{- if ne "0" . -}}
+        {{- $pages_str = . -}}
+        {{- $page_range = true -}}
+    {{- end -}}
+{{- end -}}
+{{- with index $pages 1 -}}
+    {{- if $pages_str -}}
+        {{- $pages_str = printf "%s--\u200B" $pages_str -}}
+    {{- end -}}
+    {{- $pages_str = printf "%s%s" $pages_str . -}}
+{{- end -}}
+{{- if gt $pages 2 -}}
+    {{- $pages_str = printf "%s--\u200B%s" $pages_str (delimit (after 2 $pages) "--") -}}
+{{- end -}}
+{{- if $pages_str -}}
+    {{- if $page_range -}}
+        {{- $pages_str = printf (T "page_range_string" (len $pages)) $pages_str | markdownify -}}
+    {{- else -}}
+        {{- $pages_str = printf (T "page_count_string" (len $pages)) $pages_str | markdownify -}}
+    {{- end -}}
+{{- end -}}
+{{- $pubdata = merge $pubdata (dict "thepages" $pages_str) -}}
+
+{{- $edition := .Entry.Params.edition -}}
+{{- if $edition -}}
+    {{- $humanized_edition := humanize $edition -}}
+    {{- $humanized_suffix  := strings.TrimPrefix $edition $humanized_edition -}}
+    {{- $edition = T "book_edition" (dict "edition" $edition "humanized_edition" $humanized_edition "humanized_suffix" $humanized_suffix) | markdownify -}}
+{{- end -}}
+{{- $pubdata = merge $pubdata (dict "edition" $edition) -}}
+
+{{- $pubdata = merge .Entry.Params $pubdata -}}
+{{- $pubdata = merge $pubdata (dict "DisplayPage" .Page "Settings" .Settings) -}}
+
+{{- $event := $pubdata.Params.event -}}
+
+{{- $bibtex := partial $bibtex_partial (merge $pubdata (dict "subtype" $bibtex_subtype)) -}}
+
+{{- $collapse_parent_id := printf "pub-%s" $pubdata.uniquekey -}}
+{{- $collapse_details_id := printf "details-%s" $pubdata.uniquekey -}}
+{{- $collapse_details_button_id := printf "btn-details-%s" $pubdata.uniquekey -}}
+{{- $collapse_bibtex_id := printf "bibtex-%s" $pubdata.uniquekey -}}
+{{- $collapse_bibtex_button_id := printf "btn-bibtex-%s" $pubdata.uniquekey -}}
+
+<div class="publication-entry accordion" id="{{ $collapse_parent_id }}">
+    <div class="publication-citation">
+    {{- partial $citation_partial (merge $pubdata (dict "subtype" $citation_subtype)) -}}
+    {{- with $pubdata.Params.badges -}}
+    <div class="publication-badges">
+        {{- range . -}}
+            {{- $title := .title -}}
+            {{- $tooltip := .description -}}
+            {{- $type := split .type ":" }}
+            {{- $base_type := index $type 0 }}
+            {{- $color := index $type 1 -}}
+            {{- $icon := "" -}}
+            {{- if eq $base_type "award" -}}
+                {{- $icon = "fas fa-trophy" -}}
+            {{- else if eq $base_type "bug" -}}
+                {{- $icon = "fas fa-bug" -}}
+            {{- else if eq $base_type "star" -}}
+                {{- $icon = "fas fa-star" -}}
+            {{- else if eq $base_type "heart" -}}
+                {{- $icon = "fas fa-heart" -}}
+            {{- end -}}
+        <div class="badge{{ with $color }} badge-{{ . }}{{ end }}"{{ with $tooltip }} data-toggle="tooltip" data-placement="auto" title="{{ . }}"{{ end }}>{{ with $icon }}<i class="icon {{ . }}"></i>{{ end }}<span class="label">{{ $title }}</span></div>
+        {{- end -}}
+    </div>
+    {{- end -}}
+    </div>
+    <div class="publication-buttons">
+    {{- $button_class := "btn btn-outline-primary" -}}
+    {{- $type_config := index site.Data.theme.links.types "more" -}}
+    {{- if $pubdata.is_regular_page -}}
+        {{- $label := printf "<i class=\"icon %s\"></i><span class=\"label\">%s</span>" $type_config.icon (T "publication_details") -}}
+        {{- $button_attrs := "role=\"button\"" -}}
+        {{- partial "render-link" (dict "Page" $pubdata.Page "Destination" $pubdata.permalink "InnerHTML" $label "Class" $button_class "OtherAttrs" $button_attrs "AllowUrlAttrs" true) -}}
+    {{- else if or $event $pubdata.abstract -}}
+        <button class="{{ $button_class }}" id="{{ $collapse_details_button_id }}" type="button" data-toggle="collapse" data-target="#{{ $collapse_details_id }}" aria-expanded="false" aria-controls="{{ $collapse_details_id }}"><i class="icon {{ $type_config.icon }}"></i><span class="label">{{ T "publication_details" }}</span></button>
+    {{- end -}}
+    {{- $permalink_handlers := slice "doi" "lccn" "arxiv" -}}
+    {{- range $permalink_handler := $permalink_handlers -}}
+        {{- with index $pubdata.Params $permalink_handler -}}
+            {{- $permalink_url := T (printf "%s_uri" $permalink_handler) (dict $permalink_handler .) -}}
+            {{- $permalink_title := T $permalink_handler (dict $permalink_handler .) -}}
+            {{- $type_config := index site.Data.theme.links.types "permalink" -}}
+            {{- $label := printf "<i class=\"icon %s\"></i><span class=\"label\">%s</span>" $type_config.icon (T $permalink_handler) -}}
+            {{- $button_attrs := "role=\"button\" data-toggle=\"tooltip\" data-placement=\"auto\" data-boundary=\"window\"" -}}
+            {{- partial "render-link" (dict "Page" $pubdata.Page "Destination" $permalink_url "Title" $permalink_title "InnerHTML" $label "Class" $button_class "OtherAttrs" $button_attrs "AllowUrlAttrs" true) -}}
+        {{- end -}}
+    {{- end -}}
+    {{- range $pubdata.Params.links -}}
+        {{- $link_dest := "" -}}
+        {{- if .url -}}
+            {{- $link_dest = .url -}}
+        {{- else if .resource -}}
+            {{- $link_dest = .resource -}}
+        {{- end -}}
+        {{- $type_config := index site.Data.theme.links.types site.Data.theme.links.default_type -}}
+        {{- if isset site.Data.theme.links.types .type -}}
+            {{- $type_config = index site.Data.theme.links.types .type -}}
+        {{- end -}}
+        {{- $title := .title -}}
+        {{- if not $title -}}
+            {{- with $type_config.title_i18n -}}
+                {{- $title = T . -}}
+            {{- else -}}
+                {{- $title = T .type -}}
+            {{- end -}}
+        {{- end -}}
+        {{- $link_title := .link_title -}}
+        {{- $icon := $type_config.icon -}}
+        {{- if $link_dest -}}
+            {{- $label := printf "<i class=\"icon %s\"></i><span class=\"label\">%s</span>" $icon $title -}}
+            {{- $button_attrs := "role=\"button\"" -}}
+            {{- partial "render-link" (dict "Page" $pubdata.Page "Destination" $link_dest "Title" $link_title "InnerHTML" $label "Class" $button_class "OtherAttrs" $button_attrs "AllowUrlAttrs" true) -}}
+        {{- end -}}
+    {{- end -}}
+    {{- if $bibtex -}}
+        {{- $type_config := index site.Data.theme.links.types "bibtex" -}}
+        <button class="{{ $button_class }}" id="{{ $collapse_bibtex_button_id }}" type="button" data-toggle="collapse" data-target="#{{ $collapse_bibtex_id }}" aria-expanded="false" aria-controls="{{ $collapse_bibtex_id }}"><i class="icon {{ $type_config.icon }}"></i><span class="label">{{ T "bibtex" }}</span></button>
+    {{- end -}}
+    </div>
+    <div class="collapse" id="{{ $collapse_details_id }}" data-parent="#{{ $collapse_parent_id }}">
+        <div class="publication-details">
+            {{- with $event -}}
+            <div class="event">
+                <h6 class="heading">{{ T "event" }}</h6>
+                {{- with .title -}}
+                <div class="event-name">{{ . | markdownify }}</div>
+                {{- end -}}
+                {{- with .location -}}
+                <div class="event-location">{{ . | markdownify }}</div>
+                {{- end -}}
+                {{- $event_date := partial "function-process-date" (dict "Date" nil) -}}
+                {{- $event_date_end := $event_date -}}
+                {{- if .date -}}
+                    {{- $event_date = partial "function-process-date" (dict "Date" .date) -}}
+                    {{- $event_date_end = $event_date -}}
+                {{- else if .date_start -}}
+                    {{- $event_date = partial "function-process-date" (dict "Date" .date_start) -}}
+                    {{- if .date_end -}}
+                        {{- $event_date_end = partial "function-process-date" (dict "Date" .date_end) -}}
+                    {{- else -}}
+                        {{- $event_date_end = $event_date -}}
+                    {{- end -}}
+                {{- else if $pubdata.date -}}
+                    {{- $event_date = partial "function-process-date" (dict "Date" $pubdata.date) -}}
+                    {{- $event_date_end = $event_date -}}
+                {{- end -}}
+                {{- $event_date = partial "function-process-daterange" (dict "DateStart" $event_date "DateEnd" $event_date_end) -}}
+                {{- if $event_date.yyyy -}}
+                <div class="event-date">{{ T "date_format" $event_date | markdownify }}</div>
+                {{- end -}}
+            </div>
+            <div class="spacer"></div>
+            {{- end -}}
+            {{- with $pubdata.abstract -}}
+            <div class="abstract">
+                <h6 class="heading">{{ T "abstract" }}</h6>
+                {{ . | safeHTML }}
+            </div>
+            <div class="spacer"></div>
+            {{- end -}}
+        </div>
+    </div>
+    {{- with $bibtex -}}
+    <div class="collapse" id="{{ $collapse_bibtex_id }}" data-parent="#{{ $collapse_parent_id }}">
+        <div class="publication-details">
+            <div class="bibtex">
+                <div class="bibtex-data">{{ . }}</div>
+            </div>
+            <div class="spacer"></div>
+        </div>
+    </div>
+    {{- end -}}
+    <script type="text/javascript">
+    $('#{{ $collapse_details_id }}').on('hide.bs.collapse', function () {
+        $('#{{ $collapse_details_button_id }}').removeClass('active');
+    })
+    $('#{{ $collapse_details_id }}').on('show.bs.collapse', function () {
+        $('#{{ $collapse_details_button_id }}').addClass('active');
+    })
+    $('#{{ $collapse_bibtex_id }}').on('hide.bs.collapse', function () {
+        $('#{{ $collapse_bibtex_button_id }}').removeClass('active');
+    })
+    $('#{{ $collapse_bibtex_id }}').on('show.bs.collapse', function () {
+        $('#{{ $collapse_bibtex_button_id }}').addClass('active');
+    })
+    </script>
+</div>

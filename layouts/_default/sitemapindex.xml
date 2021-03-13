@@ -1,0 +1,22 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{ printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?>" | safeHTML }}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{{- range . }}
+  <sitemap>
+    <loc>{{ .SitemapAbsURL }}</loc>
+    {{- if not .LastChange.IsZero }}
+    <lastmod>{{ .LastChange.Format "2006-01-02T15:04:05-07:00" | safeHTML }}</lastmod>
+    {{- else if not (index .Sites 0).LastChange.IsZero }}
+    <lastmod>{{ (index .Sites 0).LastChange.Format "2006-01-02T15:04:05-07:00" | safeHTML }}</lastmod>
+    {{- end }}
+  </sitemap>
+{{- end }}
+</sitemapindex>

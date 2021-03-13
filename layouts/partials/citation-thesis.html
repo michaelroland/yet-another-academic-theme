@@ -1,0 +1,47 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Bibliographic citation renderer for thesis publication type.
+
+Context: The current publication data context.
+
+*/ -}}
+{{- partial "citation-include-author-only-title" . -}},
+{{- $thesis_types := slice -}}
+{{- $thesis_types := $thesis_types | append (dict "type" "phd"      "title" (T "phd_thesis")) -}}
+{{- $thesis_types := $thesis_types | append (dict "type" "master"   "title" (T "master_thesis")) -}}
+{{- $thesis_types := $thesis_types | append (dict "type" "diploma"  "title" (T "diploma_thesis")) -}}
+{{- $thesis_types := $thesis_types | append (dict "type" "bachelor" "title" (T "bachelor_thesis")) -}}
+{{- $thesis_type := index (index $thesis_types 0) "title" -}}
+{{- with .thesis_type -}}
+    {{- $thesis_type = . | markdownify -}}
+{{- else -}}
+    {{- range $thesis_types -}}
+        {{- if hasPrefix $.subtype .type -}}
+            {{- $thesis_type = .title -}}
+        {{- end -}}
+    {{- end -}}
+{{- end }}
+<span class="type">{{ $thesis_type}}</span>
+{{- with .school -}}
+, <span class="school">{{ . | markdownify }}</span>
+{{- end -}}
+{{- with .address -}}
+, <span class="address">{{ . | markdownify }}</span>
+{{- end -}}
+{{- with .thepages -}}
+, <span class="pages">{{ . }}</span>
+{{- end -}}
+{{- with .thedate.yyyy -}}
+, <span class="year">{{ . }}</span>
+{{- end -}}
+{{- if gt .advisors.count 0 -}}
+. <span class="advisor">{{ partial "citation-include-advisorlist" . }}</span>
+{{- end -}}
+{{- partial "citation-include-refs" . -}}

@@ -1,0 +1,42 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Bibliographic citation renderer for periodical publication type.
+
+Context: The current publication data context.
+
+*/ -}}
+{{- partial "citation-include-author-eds-org-title" . -}}
+{{- with .volume }}
+<span class="volume">{{ T "journal_volume" (dict "volume" .) | markdownify }}</span>
+{{- end -}}
+{{- with .number -}}
+, <span class="number">{{ . | markdownify }}</span>
+{{- end -}}
+{{- if or (gt .authors.count 0) (gt .editors.count 0) -}}
+    {{- with .organization -}}
+, <span class="organization">{{ . | markdownify }}</span>
+    {{- end -}}
+{{- end -}}
+{{- with .howpublished -}}
+, <span class="howpublished">{{ . | markdownify }}</span>
+{{- end -}}
+{{- with .publisher -}}
+, <span class="publisher">{{ . | markdownify }}</span>
+{{- end -}}
+{{- with .address -}}
+, <span class="address">{{ . | markdownify }}</span>
+{{- end -}}
+{{- with .thepages -}}
+, <span class="pages">{{ . }}</span>
+{{- end -}}
+{{- with .thedate.yyyy -}}
+, <span class="year">{{ . }}</span>
+{{- end -}}
+{{- partial "citation-include-refs" . -}}

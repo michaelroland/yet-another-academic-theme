@@ -1,0 +1,18 @@
+## Theme configuration: Preview List
+## 
+##  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+##  
+##  This Source Code Form is subject to the terms of the Mozilla Public
+##  License, v. 2.0. If a copy of the MPL was not distributed with this
+##  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+## 
+
+paginator_top_default = false
+paginator_bottom_default = true
+max_columns = 3
+
+[column_breakpoints]
+	1 = ""
+	2 = "col-md-6"
+	3 = "col-sm-6 col-lg-4"
+	default = "col-sm-6 col-lg-4"

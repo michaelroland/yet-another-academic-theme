@@ -1,0 +1,140 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Shortcode: Print one or more "people" V-Card entry with optional biography.
+
+Note: This shortcode expects an ".Inner" body and, therefore, needs to be closed.
+
+Param: name          One or more "people" entries given by their "name" attribute;
+           multiple names may be separate with semi-colons (";") if name does not
+           reference any "people" entry, it is considered a verbatim name.
+Param: id            One or more "people" entries given by their ID (the file basename
+           of the "people" entry); multiple IDs may be separate with commas (",").
+Param: sort          The sort order specification in the form:
+           field [ ":" ( "asc" | "desc" ) ] { "," field [ ":" ( "asc" | "desc" ) ] }.
+Param: group_by      Group the result by these fields and use the field values as group
+           headers; multiple fields may be separate with commas (",") for multi-level
+           grouping hierarchies.
+Param: header_level  The heading level (1-6) of the top-level group header; defaults to 2.
+Param: header_class  An optional class attribute to add to all group headers.
+Param: limit         Only display the first "level" results.
+Param: display_name  Add a header with the person's display name to each "people" entry;
+           note that this is ignored in V-Card display mode, otherwise it is the same as
+           using "title" as the last "group_by" field.
+Param: bio           If true, display the biography text; defaults to false.
+Param: preview_limit Number of paragraphs to display as biography preview; additional
+           paragraphs are collapsed by default; defaults to 0 to display the whole
+           biography.
+Param: portrait_size        Override default regular portrait size (in px) for V-Card.
+Param: portrait_size_small  Override default reduced portrait size (in px) for V-Card.
+Param: vcard_hide_icons     If true, do not display V-Card element icons; defaults to false.
+Param: vcard_hide_elements  An optional (comma-delimited) list of elements to hide
+           from V-Card.
+
+Note: The following additional parameters only make sense when displaying a single entry.
+Param: portrait        Override the portrait displayed for the V-Card entry.
+Param: [element.type]  Set or override the value of the V-Card element (see
+           "site.Data.theme.vcard.elements" for valid element types.
+Param: [element.type + element.secondary]  Set or override the secondary value of the
+           V-Card element ("site.Data.theme.vcard.elements" for valid element types and
+           secondary suffixes).
+Inner: Additional V-Card elements.
+
+Page-level Params:
+    biography.portrait_size
+    biography.portrait_size_small
+    biography.preview_limit
+    biography.vcard_hide_icons
+    biography.vcard_hide_elements
+
+*/ -}}
+{{- $people_bundle_current_lang := site.GetPage (printf "/%s" site.Data.theme.config.people_bundle) -}}
+{{- $people_bundle_default_lang := site.Sites.First.GetPage (printf "/%s" site.Data.theme.config.people_bundle) -}}
+{{- $people := $people_bundle_current_lang.Pages | lang.Merge $people_bundle_default_lang.Pages -}}
+{{- $people = where $people "Params.hidden" "!=" true -}}
+
+{{- $people_merged := slice -}}
+{{- range $people -}}
+    {{- $people_dict := dict "EntryPage" . "Params" .Params -}}
+    {{- $people_merged = $people_merged | append $people_dict -}}
+{{- end -}}
+{{- $people = $people_merged -}}
+
+{{- with .Get "name" -}}
+    {{- $filter := . -}}
+    {{- $match := "in" -}}
+    {{- if ne $filter "*" -}}
+        {{- if eq (substr $filter 0 1) "!" -}}
+            {{- $match = "not in" -}}
+            {{- $filter = substr $filter 1 -}}
+        {{- end -}}
+        {{- $filter := split $filter ";" }}
+        {{- $people = where $people "Params.name" $match $filter -}}
+    {{- end -}}
+{{- end -}}
+
+{{- with .Get "id" -}}
+    {{- $filter := . -}}
+    {{- $match := "in" -}}
+    {{- if ne $filter "*" -}}
+        {{- if eq (substr $filter 0 1) "!" -}}
+            {{- $match = "not in" -}}
+            {{- $filter = substr $filter 1 -}}
+        {{- end -}}
+        {{- $filter := split $filter "," }}
+        {{- $people = where $people "EntryPage.File.ContentBaseName" $match $filter -}}
+    {{- end -}}
+{{- end -}}
+
+{{- with .Get "sort" -}}
+    {{- range split . "," }}
+        {{- $sort_spec := split . ":" -}}
+        {{- $field := index $sort_spec 0 -}}
+        {{- $order := lower (index $sort_spec 1) -}}
+        {{- if not $field -}}
+            {{- $field = "name" -}}
+        {{- end -}}
+        {{- if ne $order "desc" -}}
+            {{- $order = "asc" -}}
+        {{- end -}}
+        {{- $field := printf "Params.%s" $field -}}
+        {{- $people = sort $people $field $order -}}
+    {{- end -}}
+{{- end -}}
+{{- $group_by := slice -}}
+{{- with .Get "group_by" -}}
+    {{- $group_by = split . "," -}}
+{{- end -}}
+{{- $group_header_level := 2 -}}
+{{- with .Get "header_level" -}}
+    {{- $group_header_level = int . -}}
+{{- end -}}
+{{- $group_header_class := "" -}}
+{{- with .Get "header_class" -}}
+    {{- $group_header_class = . -}}
+{{- end -}}
+
+{{- with .Get "limit" -}}
+    {{- $people = $people | first . -}}
+{{- end -}}
+
+{{- $settings := dict "bio" false -}}
+{{- $settings = merge $settings .Params -}}
+{{- $settings = merge $settings (dict "vcard" true) -}}
+{{- $settings = merge $settings (dict "vcard_innerhtml" nil) -}}
+{{- with .Inner -}}
+    {{- $settings = merge $settings (dict "vcard_innerhtml" .) -}}
+{{- end -}}
+
+{{- if $people -}}
+    {{- $settings = merge $settings (dict "name" nil) -}}
+    {{- partial "render-grouped-list" (dict "Page" $.Page "Entries" $people "Partial" "biography" "Settings" $settings "GroupBy" $group_by "HeaderLevel" $group_header_level "HeaderClass" $group_header_class) -}}
+{{- else -}}
+    {{- partial "biography" (dict "Page" $.Page "Entry" nil "Settings" $settings) -}}
+{{- end -}}

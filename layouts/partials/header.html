@@ -1,0 +1,197 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render page header and main (top) navigation.
+
+Context: The current page context.
+
+*/ -}}
+<nav id="main-navigation" class="navbar navbar-dark navbar-expand-lg fixed-top-lg bg-dark" role="navigation" aria-label="{{ T "main_menu" }}">
+    <div class="container container-fluid-lg">
+        <div class="navbar-brand">
+            {{ if $.Site.Params.icon }}<a class="navbar-brand-icon" href="{{ $.Site.Home.RelPermalink }}"><img src="{{ $.Site.Params.icon | relURL }}" height="39" alt=" " title=""></a>{{ end }}
+            <a class="navbar-brand-text" href="{{ $.Site.Home.RelPermalink }}">{{ $.Site.Title }}</a>
+        </div>
+        <div class="navbar-toggler-area">
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#main-language-navbar" aria-expanded="false" aria-controls="main-language-navbar" aria-label="{{ T "select_language" }}">
+                <span class="navbar-language-icon"></span>
+            </button>
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#main-navbar" aria-expanded="false" aria-controls="main-navbar" aria-label="{{ T "toggle_navigation" }}">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+        <div id="main-navbar" class="collapse navbar-collapse" data-parent="#main-navigation">
+            <ul class="navbar-nav mr-auto">
+            {{- range $.Site.Menus.main -}}
+                {{- $menuHidden := false -}}
+                {{- $menuCurrent := $.Page.IsMenuCurrent .Menu . -}}
+                {{- $menuCurrentParent := $.Page.HasMenuCurrent .Menu . -}}
+                {{- $hasVisibleChildren := false -}}
+                {{- with .Page -}}
+                    {{- $menuHidden = .Params.hidden -}}
+                {{- end -}}
+                {{- if not $menuHidden -}}
+                    {{- range .Children -}}
+                        {{- with .Page -}}
+                            {{- if not .Params.hidden -}}
+                                {{- $hasVisibleChildren = true -}}
+                            {{- end -}}
+                        {{- end -}}
+                    {{- end -}}
+                <li class="nav-item{{ if $hasVisibleChildren }} dropdown{{ end }}{{ if $menuCurrent }} active{{ end }}{{ if $menuCurrentParent }} child-active{{ end }}"{{ if $menuCurrent }} aria-current="page"{{ end }}>
+                    {{- $url := .URL -}}
+                    {{- with .Page -}}
+                        {{- with .Params.target -}}
+                            {{- $url = . -}}
+                        {{- end -}}
+                    {{- end -}}
+                    {{- $label := .Name -}}
+                    {{- with .Title -}}
+                        {{- $label = . }}
+                    {{- end -}}
+                    {{- $class := "nav-link" -}}
+                    {{- if $hasVisibleChildren -}}
+                        {{- $class = print $class " dropdown-toggle" -}}
+                    {{- end -}}
+                    {{- $page := $.Page -}}
+                    {{- with .Page -}}
+                        {{- $page = . }}
+                    {{- end -}}
+                    {{- partial "render-link" (dict "Page" $page "Destination" $url "InnerHTML" $label "Class" $class "AllowUrlAttrs" true) -}}
+                    {{- if $hasVisibleChildren -}}
+                    <div class="dropdown-menu">
+                        {{- range .Children -}}
+                            {{- $menuHidden := false -}}
+                            {{- $menuCurrent := $.Page.IsMenuCurrent .Menu . -}}
+                            {{- $menuCurrentParent := $.Page.HasMenuCurrent .Menu . -}}
+                            {{- $hasVisibleChildren := false -}}
+                            {{- with .Page -}}
+                                {{- $menuHidden = .Params.hidden -}}
+                            {{- end -}}
+                            {{- if not $menuHidden -}}
+                                {{- range .Children -}}
+                                    {{- with .Page -}}
+                                        {{- if not .Params.hidden -}}
+                                            {{- $hasVisibleChildren = true -}}
+                                        {{- end -}}
+                                    {{- end -}}
+                                {{- end }}
+                                {{- $url := .URL -}}
+                                {{- with .Page -}}
+                                    {{- with .Params.target -}}
+                                        {{- $url = . -}}
+                                    {{- end -}}
+                                {{- end -}}
+                                {{- $label := .Name -}}
+                                {{- with .Title -}}
+                                    {{- $label = . }}
+                                {{- end -}}
+                                {{- if $hasVisibleChildren -}}
+                                    {{- $label = print $label "<span class=\"caret\"></span>" -}}
+                                {{- end -}}
+                                {{- $class := "dropdown-item" -}}
+                                {{- $attrs := "" -}}
+                                {{- if $menuCurrent -}}
+                                    {{- $class = print $class " active" -}}
+                                    {{- $attrs = "aria-current=\"page\"" -}}
+                                {{- end -}}
+                                {{- if $menuCurrentParent -}}
+                                    {{- $class = print $class " child-active" -}}
+                                {{- end -}}
+                                {{- $page := $.Page -}}
+                                {{- with .Page -}}
+                                    {{- $page = . }}
+                                {{- end -}}
+                        <div class="dropright">
+                                {{- partial "render-link" (dict "Page" $page "Destination" $url "InnerHTML" $label "Class" $class "AllowUrlAttrs" true) -}}
+                                {{- if $hasVisibleChildren -}}
+                            <div class="dropdown-menu">
+                                    {{- range .Children -}}
+                                        {{- $menuHidden := false -}}
+                                        {{- $menuCurrent := $.Page.IsMenuCurrent .Menu . -}}
+                                        {{- $menuCurrentParent := $.Page.HasMenuCurrent .Menu . -}}
+                                        {{- $hasVisibleChildren := false -}}
+                                        {{- with .Page -}}
+                                            {{- $menuHidden = .Params.hidden -}}
+                                        {{- end -}}
+                                        {{- if not $menuHidden -}}
+                                            {{- range .Children -}}
+                                                {{- with .Page -}}
+                                                    {{- if not .Params.hidden -}}
+                                                        {{- $hasVisibleChildren = true -}}
+                                                    {{- end -}}
+                                                {{- end -}}
+                                            {{- end }}
+                                            {{- $url := .URL -}}
+                                            {{- if .Page -}}
+                                                {{- with .Page.Params.target -}}
+                                                    {{- $url = . -}}
+                                                {{- end -}}
+                                            {{- end -}}
+                                            {{- $label := .Name -}}
+                                            {{- with .Title -}}
+                                                {{- $label = . }}
+                                            {{- end -}}
+                                            {{- if $hasVisibleChildren -}}
+                                                {{- $label = print $label "<span class=\"caret\"></span>" -}}
+                                            {{- end -}}
+                                            {{- $class := "dropdown-item" -}}
+                                            {{- $attrs := "" -}}
+                                            {{- if $menuCurrent -}}
+                                                {{- $class = print $class " active" -}}
+                                                {{- $attrs = "aria-current=\"page\"" -}}
+                                            {{- end -}}
+                                            {{- if $menuCurrentParent -}}
+                                                {{- $class = print $class " child-active" -}}
+                                            {{- end -}}
+                                            {{- $page := $.Page -}}
+                                            {{- with .Page -}}
+                                                {{- $page = . }}
+                                            {{- end -}}
+                                            {{- partial "render-link" (dict "Page" $page "Destination" $url "InnerHTML" $label "Class" $class "AllowUrlAttrs" true) -}}
+                                        {{- end -}}
+                                    {{- end -}}
+                            </div>
+                                {{- end -}}
+                        </div>
+                            {{- end -}}
+                        {{- end -}}
+                    </div>
+                    {{- end -}}
+                </li>
+                {{- end -}}
+            {{- end -}}
+            </ul>
+        </div><!--/#main-navbar -->
+        {{- if $.Site.IsMultiLingual -}}
+        <div id="main-language-navbar" class="collapse navbar-collapse navbar-grow-right" data-parent="#main-navigation">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" title="{{ T "select_language" }}">{{ $.Site.Language.LanguageName }}</a>
+                    <div class="dropdown-menu">
+            {{- range $.Site.Home.AllTranslations -}}
+                {{- $translationURL := .RelPermalink -}}
+                {{- range where $.Page.Translations "Language.Lang" .Language.Lang -}}
+                    {{- $translationURL = .RelPermalink -}}
+                {{- end -}}
+                {{- if eq $.Site.Language.Lang .Language.Lang -}}
+                    {{- $translationURL = $.Page.RelPermalink -}}
+                {{- end -}}
+                        <a class="dropdown-item{{ if eq $.Site.Language.Lang .Language.Lang }} active{{ end }}" href="{{ $translationURL | safeURL }}">{{ .Language.LanguageName }}</a>
+            {{- end -}}
+                    </div>
+                </li>
+            </ul>
+        </div><!--/#main-language-navbar -->
+        {{- end -}}
+    </div>
+</nav><!--/#main-navigation -->
+
+<header id="header" role="banner">
+</header><!--/#header -->

@@ -1,0 +1,70 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Shortcode: Print a column in a side-by-side multi-column environment.
+
+Note: This shortcode expects an ".Inner" body and, therefore, needs to be closed.
+
+Inner: Contents of the column.
+
+*/ -}}
+{{- with $.Parent -}}
+    {{- if ne .Name "columns" -}}
+        {{- errorf "%s: shortcode %q must be nested within shortcode %q" $.Position "column" "columns" -}}
+    {{- end -}}
+{{- else -}}
+    {{- errorf "%s: shortcode %q must be nested within shortcode %q" $.Position "column" "columns" -}}
+{{- end -}}
+
+{{- $column_index := mod ($.Ordinal | add 1) 12 -}}
+{{- $column_class := "" -}}
+
+{{- $columns := int ($.Parent.Get (cond $.Parent.IsNamedParams "cols" 0)) -}}
+{{- if or (gt $columns 12) (lt $columns 1) -}}
+    {{- errorf "%s: Number of columns must be in range 1..12 (but is %d) in shortcode %q" $.Parent.Position $columns $.Parent.Name -}}
+{{- end -}}
+{{- $colspan := div 12 $columns -}}
+{{- $remainder := sub 12 (mul $columns $colspan) -}}
+{{- $last_columns := 12 -}}
+
+{{- range $index := seq 1 13 -}}
+    {{- $value := cond (and (lt $index 13) (not $.Parent.IsNamedParams)) ($.Parent.Get $index) false -}}
+    {{- if or $value (eq $index 13) -}}
+        {{- if modBool $index 2 -}}
+            {{- $columns = int $value -}}
+            {{- if or (gt $columns 12) (lt $columns 1) -}}
+                {{- errorf "%s: Number of columns must be in range 1..12 (but is %d) in shortcode %q" $.Parent.Position $columns $.Parent.Name -}}
+            {{- end -}}
+            {{- if gt $columns $last_columns -}}
+                {{- errorf "%s: Number of columns must be less or equal to previous breakpoint in argument %d (%d > %d) in shortcode %q" $.Parent.Position $index $columns $last_columns $.Parent.Name -}}
+            {{- end -}}
+            {{- $colspan = div 12 $columns -}}
+            {{- $remainder = sub 12 (mul $columns $colspan) -}}
+        {{- else -}}
+            {{- $breakpoint := "" -}}
+            {{- with $value -}}
+                {{- $breakpoint = printf "-%s" . -}}
+            {{- end -}}
+            {{- if modBool $column_index $columns -}}
+                {{- $column_class = printf "col%s-%d %s" $breakpoint ($colspan | add $remainder) $column_class -}}
+            {{- else -}}
+                {{- $column_class = printf "col%s-%d %s" $breakpoint $colspan $column_class -}}
+            {{- end -}}
+            {{- $colspan = 12 -}}
+            {{- $remainder = 0 -}}
+            {{- $last_columns = $columns -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+<div class="{{ trim $column_class " " }}">
+{{- with .Inner -}}
+    {{- . -}}
+{{- end -}}
+</div>

@@ -1,0 +1,75 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render content preview (for a post or other page of a bundle).
+
+Param: Page       The current page context (may be omitted).
+Param: Entry      The page-meta object of the people data entry.
+Param: Settings   Optional dict of local scope (e.g. shortcodes, previews) settings.
+
+Settings:
+    display_authors
+    display_date
+
+Page-level Params:
+    posts.display_authors
+    posts.display_date
+    list.display_authors
+    list.display_date
+
+*/ -}}
+{{- $display_authors := $.Entry.display_authors -}}
+{{- $display_date := $.Entry.display_date -}}
+{{- with $.Page -}}
+    {{- with .Param "posts.display_authors" -}}
+        {{- $display_authors = . -}}
+    {{- end -}}
+    {{- with .Param "list.display_authors" -}}
+        {{- $display_authors = . -}}
+    {{- end -}}
+    {{- with .Param "posts.display_date" -}}
+        {{- $display_date = . -}}
+    {{- end -}}
+    {{- with .Param "list.display_date" -}}
+        {{- $display_date = . -}}
+    {{- end -}}
+{{- end -}}
+{{- with $.Settings -}}
+    {{- if isset . "display_authors" -}}
+        {{- $display_authors = .display_authors -}}
+    {{- end -}}
+    {{- if isset . "display_date" -}}
+        {{- $display_date = .display_date -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $preview_link := split (partial "render-link" (dict "Page" $.Entry.Page "Destination" $.Entry.permalink "InnerHTML" "<<!!!>>" "Class" "card card-hover post-preview" "AllowUrlAttrs" true)) "<<!!!>>" -}}
+{{- index $preview_link 0 | safeHTML -}}
+    <div class="card-header card-header-img"{{ with $.Entry.preview_icon }} style="background-image: url('{{ . | safeURL }}');"{{ end }}>
+        <h4 class="card-title">{{ $.Entry.Page.Title }}</h4>
+        {{- if and $display_authors (gt $.Entry.authors.count 0) -}}
+        <p class="card-text author">
+            {{- T "authored_by" }} {{ partial "render-authorlist" (merge $.Entry (dict "author_links" false)) -}}
+        </p>
+        {{- end -}}
+    </div>
+    <div class="card-body">
+        {{- replace $.Entry.abstract "<p>" "<p class=\"card-text\">" | safeHTML -}}
+        <div class="card-text bottom-line d-flex flex-row flex-wrap">
+            {{- if and $display_date $.Entry.moddate.date -}}
+            <div class="align-self-end mr-auto authored-date">
+                <i class="fas fa-calendar pr-2"></i>{{- T "date_format_short" $.Entry.moddate -}}
+            </div>
+            {{- end -}}
+            <div class="align-self-end ml-auto read-more link">
+                <i class="fas fa-angle-double-right pr-1"></i>{{- T "read_more" -}}
+            </div>
+        </div>
+    </div>
+{{- index $preview_link 1 | safeHTML -}}

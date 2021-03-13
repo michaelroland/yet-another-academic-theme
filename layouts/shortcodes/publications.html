@@ -1,0 +1,250 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Shortcode: Print a list of publication entries (citation summary style).
+
+Param: author         An optional publication alias of an author (may be prefixed
+           with "!" to exclude that author) or "*" to include all authors (the default).
+Param: author_includes_editor If true, the search for the "author" parameter also
+           includes searching the editor fields.
+Param: editor         An optional publication alias of an editor (may be prefixed
+           with "!" to exclude that editor) or "*" to include all editors (the default).
+Param: advisor        An optional publication alias of an advisor (may be prefixed
+           with "!" to exclude that advisor) or "*" to include all advisors (the default).
+Param: type           An optional comma-separated list of publication types to include
+           (may be prefixed with "!" to exclude these types) or "*" to include any type
+           (the default).
+Param: id             An optional comma-separated list of entries to include given by
+           their ID (the file basename of the bundle entry).
+Param: refereed       An optional boolean value to select only refereed (if true)
+           or not refereed (if false) entries; defaults to any entry if unset.
+Param: promoted       An optional boolean value to select only promoted (if true)
+           or not promoted (if false) entries; defaults to any entry if unset.
+Param: sort           The sort order specification in the form:
+           field [ ":" ( "asc" | "desc" ) ] { "," field [ ":" ( "asc" | "desc" ) ] }.
+Param: group_by       Group the result by these fields and use the field values as group
+           headers; multiple fields may be separate with commas (",") for multi-level
+           grouping hierarchies.
+Param: header_level   The heading level (1-6) of the top-level group header; defaults to 2.
+Param: header_class   An optional class attribute to add to all group headers.
+Param: limit            Only display the first "level" results.
+Param: author_links   An optional boolean value to override the page-level default
+           for displaying author names as links to their "people" page.
+Param: editor_links   An optional boolean value to override the page-level default
+           for displaying editor names as links to their "people" page.
+Param: advisor_links  An optional boolean value to override the page-level default
+           for displaying advisor names as links to their "people" page.
+
+Page-level Params:
+    author_links
+    editor_links
+    advisor_links
+
+*/ -}}
+{{- $publications_bundle_current_lang := site.GetPage (printf "/%s" site.Data.theme.config.publications_bundle) -}}
+{{- $publications_bundle_default_lang := site.Sites.First.GetPage (printf "/%s" site.Data.theme.config.publications_bundle) -}}
+{{- $publications := $publications_bundle_current_lang.Pages | lang.Merge $publications_bundle_default_lang.Pages -}}
+{{- $publications = where $publications "Params.hidden" "!=" true -}}
+
+{{- $publications_merged := slice -}}
+{{- range $publications -}}
+    {{- $pub_dict := dict "EntryPage" . "Params" .Params -}}
+    {{- $publications_merged = $publications_merged | append $pub_dict -}}
+{{- end -}}
+{{- $publications = $publications_merged -}}
+
+{{- with .Get "author" -}}
+    {{- $filter := . -}}
+    {{- $expect_match := true -}}
+    {{- $match_editor := false -}}
+    {{- if ne (.Get "author_includes_editor") "" -}}
+        {{- $match_editor = .Get "author_includes_editor" -}}
+    {{- end -}}
+    {{- if ne $filter "*" -}}
+        {{- if eq (substr $filter 0 1) "!" -}}
+            {{- $expect_match = false -}}
+            {{- $filter = substr $filter 1 -}}
+        {{- end -}}
+        {{- $pub_filtered := slice -}}
+        {{- range $pub := $publications -}}
+            {{- $is_match := false -}}
+            {{- $author_list := $pub.Params.author -}}
+            {{- if and $author_list (not (reflect.IsSlice $author_list)) -}}
+                {{- $author_list = slice $author_list -}}
+            {{- else if not $author_list -}}
+                {{- $author_list = slice -}}
+            {{- end -}}
+            {{- if in $author_list $filter -}}
+                {{- $is_match = true -}}
+            {{- else if $match_editor -}}
+                {{- $editor_list := $pub.Params.editor -}}
+                {{- if and $editor_list (not (reflect.IsSlice $editor_list)) -}}
+                    {{- $editor_list = slice $editor_list -}}
+                {{- else if not $editor_list -}}
+                    {{- $editor_list = slice -}}
+                {{- end -}}
+                {{- if in $editor_list $filter -}}
+                    {{- $is_match = true -}}
+                {{- end -}}
+            {{- end -}}
+            {{- if eq $expect_match $is_match -}}
+                {{- $pub_filtered = $pub_filtered | append $pub -}}
+            {{- end -}}
+        {{- end -}}
+        {{- $publications = $pub_filtered -}}
+    {{- end -}}
+{{- end -}}
+
+{{- with .Get "editor" -}}
+    {{- $filter := . -}}
+    {{- $expect_match := true -}}
+    {{- if ne $filter "*" -}}
+        {{- if eq (substr $filter 0 1) "!" -}}
+            {{- $expect_match = false -}}
+            {{- $filter = substr $filter 1 -}}
+        {{- end -}}
+        {{- $pub_filtered := slice -}}
+        {{- range $pub := $publications -}}
+            {{- $is_match := false -}}
+            {{- $editor_list := $pub.Params.editor -}}
+            {{- if and $editor_list (not (reflect.IsSlice $editor_list)) -}}
+                {{- $editor_list = slice $editor_list -}}
+            {{- else if not $editor_list -}}
+                {{- $editor_list = slice -}}
+            {{- end -}}
+            {{- if in $editor_list $filter -}}
+                {{- $is_match = true -}}
+            {{- end -}}
+            {{- if eq $expect_match $is_match -}}
+                {{- $pub_filtered = $pub_filtered | append $pub -}}
+            {{- end -}}
+        {{- end -}}
+        {{- $publications = $pub_filtered -}}
+    {{- end -}}
+{{- end -}}
+
+{{- with .Get "advisor" -}}
+    {{- $filter := . -}}
+    {{- $expect_match := true -}}
+    {{- if ne $filter "*" -}}
+        {{- if eq (substr $filter 0 1) "!" -}}
+            {{- $expect_match = false -}}
+            {{- $filter = substr $filter 1 -}}
+        {{- end -}}
+        {{- $pub_filtered := slice -}}
+        {{- range $pub := $publications -}}
+            {{- $is_match := false -}}
+            {{- $advisor_list := $pub.Params.advisor -}}
+            {{- if and $advisor_list (not (reflect.IsSlice $advisor_list)) -}}
+                {{- $advisor_list = slice $advisor_list -}}
+            {{- else if not $advisor_list -}}
+                {{- $advisor_list = slice -}}
+            {{- end -}}
+            {{- if in $advisor_list $filter -}}
+                {{- $is_match = true -}}
+            {{- end -}}
+            {{- if eq $expect_match $is_match -}}
+                {{- $pub_filtered = $pub_filtered | append $pub -}}
+            {{- end -}}
+        {{- end -}}
+        {{- $publications = $pub_filtered -}}
+    {{- end -}}
+{{- end -}}
+
+{{- with .Get "type" -}}
+    {{- $filter := . -}}
+    {{- $expect_match := true -}}
+    {{- if ne $filter "*" -}}
+        {{- if eq (substr $filter 0 1) "!" -}}
+            {{- $expect_match = false -}}
+            {{- $filter = substr $filter 1 -}}
+        {{- end -}}
+        {{- $filter = split $filter "," -}}
+        {{- $pub_filtered := slice -}}
+        {{- range $pub := $publications -}}
+            {{- $is_match := false -}}
+            {{- range $filter -}}
+                {{- if eq $pub.Params.publication_type . -}}
+                    {{- $is_match = true -}}
+                {{- else if hasPrefix $pub.Params.publication_type (printf "%s:" .) -}}
+                    {{- $is_match = true -}}
+                {{- end -}}
+            {{- end -}}
+            {{- if eq $expect_match $is_match -}}
+                {{- $pub_filtered = $pub_filtered | append $pub -}}
+            {{- end -}}
+        {{- end -}}
+        {{- $publications = $pub_filtered -}}
+    {{- end -}}
+{{- end -}}
+
+{{- with .Get "id" -}}
+    {{- $filter := . -}}
+    {{- $match := "in" -}}
+    {{- if ne $filter "*" -}}
+        {{- if eq (substr $filter 0 1) "!" -}}
+            {{- $match = "not in" -}}
+            {{- $filter = substr $filter 1 -}}
+        {{- end -}}
+        {{- $filter := split $filter "," }}
+        {{- $publications = where $publications "EntryPage.File.ContentBaseName" $match $filter -}}
+    {{- end -}}
+{{- end -}}
+
+{{- if ne (.Get "refereed") "" -}}
+    {{- if .Get "refereed" -}}
+        {{- $publications = where $publications "Params.refereed" true -}}
+    {{- else -}}
+        {{- $publications = where $publications "Params.refereed" "!=" true -}}
+    {{- end -}}
+{{- end -}}
+
+{{- if ne (.Get "promoted") "" -}}
+    {{- if .Get "promoted" -}}
+        {{- $publications = where $publications "Params.promoted" true -}}
+    {{- else -}}
+        {{- $publications = where $publications "Params.promoted" "!=" true -}}
+    {{- end -}}
+{{- end -}}
+
+{{- with .Get "sort" -}}
+    {{- range split . "," }}
+        {{- $sort_spec := split . ":" -}}
+        {{- $field := index $sort_spec 0 -}}
+        {{- $order := lower (index $sort_spec 1) -}}
+        {{- if not $field -}}
+            {{- $field = "date" -}}
+        {{- end -}}
+        {{- if ne $order "desc" -}}
+            {{- $order = "asc" -}}
+        {{- end -}}
+        {{- $field := printf "Params.%s" $field -}}
+        {{- $publications = sort $publications $field $order -}}
+    {{- end -}}
+{{- end -}}
+{{- $group_by := slice -}}
+{{- with .Get "group_by" -}}
+    {{- $group_by = split . "," -}}
+{{- end -}}
+{{- $group_header_level := 2 -}}
+{{- with .Get "header_level" -}}
+    {{- $group_header_level = int . -}}
+{{- end -}}
+{{- $group_header_class := "" -}}
+{{- with .Get "header_class" -}}
+    {{- $group_header_class = . -}}
+{{- end -}}
+
+{{- with .Get "limit" -}}
+    {{- $publications = $publications | first . -}}
+{{- end -}}
+
+{{- $settings := .Params -}}
+
+{{- partial "render-grouped-list" (dict "Page" .Page "Entries" $publications "Partial" "publication" "Settings" $settings "GroupBy" $group_by "HeaderLevel" $group_header_level "HeaderClass" $group_header_class) -}}

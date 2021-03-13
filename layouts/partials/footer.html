@@ -1,0 +1,84 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render page footer.
+
+Context: The current page context.
+
+*/ -}}
+<footer id="footer" class="container-fluid bg-dark" role="contentinfo">
+    <div class="container container-fluid-lg">
+        <div class="row justify-content-center links-footer">
+            <div class="col-12 col-md-6 pb-2 pb-md-0 text-center text-md-left">
+                <nav id="footer-navigation">
+                    <ul id="footer-menu" class="footer-menu">
+                    {{- range $.Site.Menus.footer -}}
+                        {{- $menuHidden := false -}}
+                        {{- with .Page -}}
+                            {{- $menuHidden = .Params.hidden -}}
+                        {{- end -}}
+                        {{- if not $menuHidden -}}
+                            {{- $url := .URL -}}
+                            {{- with .Page -}}
+                                {{- with .Params.target -}}
+                                    {{- $url = . -}}
+                                {{- end -}}
+                            {{- end -}}
+                            {{- $label := .Name -}}
+                            {{- with .Title -}}
+                                {{- $label = . }}
+                            {{- end -}}
+                            {{- $page := $.Page -}}
+                            {{- with .Page -}}
+                                {{- $page = . }}
+                            {{- end -}}
+                        <li class="menu-item">
+                            {{- partial "render-link" (dict "Page" $page "Destination" $url "InnerHTML" $label "Class" "menu-link" "AllowUrlAttrs" true) -}}
+                        </li>
+                        {{- end -}}
+                    {{- end }}
+                    </ul>
+                </nav>
+            </div>
+            <div id="footer-sociallinks" class="col-12 col-md-6 text-center text-md-right">
+                <ul id="sociallinks-menu" class="sociallinks-menu">
+                {{- range $.Site.Menus.sociallinks -}}
+                    {{- $url := .URL -}}
+                    {{- if $url -}}
+                        {{- $title := .Name -}}
+                        {{- with .Title -}}
+                            {{- $title = . }}
+                        {{- end -}}
+                        {{- $label := printf "<i class=%q></i>" .Pre -}}
+                        {{- $page := $.Page -}}
+                        {{- with .Page -}}
+                            {{- $page = . }}
+                        {{- end -}}
+                    <li class="menu-item">
+                        {{- partial "render-link" (dict "Page" $page "Destination" $url "Title" $title "InnerHTML" $label "Class" "menu-link" "AllowUrlAttrs" true) -}}
+                    </li>
+                    {{- end -}}
+                {{- end }}
+                </ul>
+            </div>
+        </div>
+        <div class="row justify-content-center copyright-footer">
+            <div class="col-12 col-md-5 pb-2 pb-md-0 text-center text-md-left">
+            {{- with $.Site.Copyright -}}
+                {{ T "copyright" | safeHTML }}&nbsp;{{ now.Format "2006" }} {{ . | safeHTML }}
+            {{- end -}}
+            </div>
+            <div class="col-12 col-md-2 text-center scroll-top">
+                <a href="#header" title="{{ T "scroll_to_top" }}"><i class="fas fa-chevron-up"></i></a>
+            </div>
+            <div class="col-12 col-md-5 text-center text-md-right">
+            </div>
+        </div>
+    </div>
+</footer>

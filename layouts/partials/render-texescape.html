@@ -1,0 +1,26 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render TeX escaped string.
+
+Context: A string.
+
+Output: TeX escaped string.
+
+*/ -}}
+{{- $s := . -}}
+{{- $s = replace $s "\\" "\\textbackslash" -}}
+{{- $s = $s | replaceRE "([#\\$%&_\\{\\}])" "\\$1" -}}
+{{- $s = replace $s "\\textbackslash\\textbackslash" "\\\\" -}}
+{{- $s = replace $s "\\textbackslash" "\\textbackslash{}" -}}
+{{- $s = replace $s "~" "\\textasciitilde{}" -}}
+{{- $s = replace $s "^" "\\^{}" -}}
+{{- $s = replace $s "<" "\\textlangle{}" -}}
+{{- $s = replace $s ">" "\\textrangle{}" -}}
+{{ $s }}

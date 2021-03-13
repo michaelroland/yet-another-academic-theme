@@ -1,0 +1,135 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Shortcode: Print a list of linked content previews (like on a bundle list page).
+
+Param: bundle           A comma-spearated list of content bundles to include in the
+           previews.
+Param: author           An optional publication alias of an author (may be prefixed
+           with "!" to exclude that author) or "*" to include all authors (the default).
+Param: id               An optional comma-separated list of bundle entries to include
+           in the previews given by their ID (the file basename of the bundle entry).
+Param: promoted         An optional boolean value to select only promoted (if true)
+           or not promoted (if false) entries; defaults to any entry if unset.
+Param: sort             The sort order specification in the form:
+           field [ ":" ( "asc" | "desc" ) ] { "," field [ ":" ( "asc" | "desc" ) ] }.
+Param: limit            Only display the first "level" results.
+Param: max_columns      An optional maximum number of columns to use for displaying
+           the content previews (overrides the page default).
+Param: display_authors  An optional boolean value to override the page-level default
+           for displaying author names in content previews.
+Param: display_date     An optional boolean value to override the page-level default
+           for displaying authoring date information in content previews.
+
+Page-level Params:
+    list.max_columns
+    posts.display_authors
+    posts.display_date
+    list.display_authors
+    list.display_date
+
+*/ -}}
+{{- $posts := slice -}}
+{{- with .Get "bundle" -}}
+    {{- range split . "," }}
+        {{- $bundle_name := printf "/%s" . -}}
+        {{- $bundle_current_lang := site.GetPage $bundle_name -}}
+        {{- $bundle_default_lang := site.Sites.First.GetPage $bundle_name -}}
+        {{- $bundle_posts := $bundle_current_lang.Pages | lang.Merge $bundle_default_lang.Pages -}}
+        {{- $bundle_posts = where $bundle_posts "Params.hidden" "!=" true -}}
+        {{- $posts = $posts | append $bundle_posts -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $posts_merged := slice -}}
+{{- range $posts -}}
+    {{- $post_dict := dict "EntryPage" . "Params" .Params -}}
+    {{- $posts_merged = $posts_merged | append $post_dict -}}
+{{- end -}}
+{{- $posts = $posts_merged -}}
+
+{{- with .Get "author" -}}
+    {{- $filter := . -}}
+    {{- $expect_match := true -}}
+    {{- if ne $filter "*" -}}
+        {{- if eq (substr $filter 0 1) "!" -}}
+            {{- $expect_match = false -}}
+            {{- $filter = substr $filter 1 -}}
+        {{- end -}}
+        {{- $posts_filtered := slice -}}
+        {{- range $post := $posts -}}
+            {{- $is_match := false -}}
+            {{- $author_list := $post.Params.author -}}
+            {{- if and $author_list (not (reflect.IsSlice $author_list)) -}}
+                {{- $author_list = slice $author_list -}}
+            {{- else if not $author_list -}}
+                {{- $author_list = slice -}}
+            {{- end -}}
+            {{- if in $author_list $filter -}}
+                {{- $is_match = true -}}
+            {{- end -}}
+            {{- if eq $expect_match $is_match -}}
+                {{- $posts_filtered = $posts_filtered | append $post -}}
+            {{- end -}}
+        {{- end -}}
+        {{- $posts = $posts_filtered -}}
+    {{- end -}}
+{{- end -}}
+
+{{- with .Get "id" -}}
+    {{- $filter := . -}}
+    {{- $match := "in" -}}
+    {{- if ne $filter "*" -}}
+        {{- if eq (substr $filter 0 1) "!" -}}
+            {{- $match = "not in" -}}
+            {{- $filter = substr $filter 1 -}}
+        {{- end -}}
+        {{- $filter := split $filter "," }}
+        {{- $posts = where $posts "EntryPage.File.ContentBaseName" $match $filter -}}
+    {{- end -}}
+{{- end -}}
+
+{{- if ne (.Get "promoted") "" -}}
+    {{- if .Get "promoted" -}}
+        {{- $posts = where $posts "Params.promoted" true -}}
+    {{- else -}}
+        {{- $posts = where $posts "Params.promoted" "!=" true -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $sort_order := "" -}}
+{{- with $.Page -}}
+    {{- $sort_order = .Page.Param "list.sort" -}}
+{{- end -}}
+{{- with .Get "sort" -}}
+    {{- $sort_order = . -}}
+{{- end -}}
+{{- with $sort_order -}}
+    {{- range split . "," }}
+        {{- $sort_spec := split . ":" -}}
+        {{- $field := index $sort_spec 0 -}}
+        {{- $order := lower (index $sort_spec 1) -}}
+        {{- if not $field -}}
+            {{- $field = "date" -}}
+        {{- end -}}
+        {{- if ne $order "desc" -}}
+            {{- $order = "asc" -}}
+        {{- end -}}
+        {{- $field := printf "Params.%s" $field -}}
+        {{- $posts = sort $posts $field $order -}}
+    {{- end -}}
+{{- end -}}
+
+{{- with .Get "limit" -}}
+    {{- $posts = $posts | first . -}}
+{{- end -}}
+
+{{- $settings := .Params -}}
+
+{{- partial "render-preview-list" (dict "Page" .Page "Entries" $posts "Partial" "preview-content" "Settings" $settings) -}}

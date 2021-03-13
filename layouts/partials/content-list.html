@@ -1,0 +1,69 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render paginated bundle content preview list.
+
+Context: The current content meta context of a bundle.
+
+*/ -}}
+{{- $posts := $.Page.Pages | lang.Merge (index $.Page.AllTranslations 0).Pages -}}
+{{- $posts = where $posts "Params.hidden" "!=" true -}}
+
+{{- with $.Page.Param "list.sort" -}}
+    {{- range split . "," }}
+        {{- $sort_spec := split . ":" -}}
+        {{- $field := index $sort_spec 0 -}}
+        {{- $order := lower (index $sort_spec 1) -}}
+        {{- if not $field -}}
+            {{- $field = "date" -}}
+        {{- end -}}
+        {{- if ne $order "desc" -}}
+            {{- $order = "asc" -}}
+        {{- end -}}
+        {{- $field := printf "Params.%s" $field -}}
+        {{- $posts = sort $posts $field $order -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $paginator_top := site.Data.theme.preview_list.paginator_top_default -}}
+{{- $paginator_top = $.Page.Param "list.top_paginator" | default $paginator_top -}}
+{{- $paginator_bottom := site.Data.theme.preview_list.paginator_bottom_default -}}
+{{- $paginator_bottom = $.Page.Param "list.bottom_paginator" | default $paginator_bottom -}}
+
+{{- $enabled := not .is_special_bundle -}}
+{{- $enabled = $.Page.Param "list.enable" | default $enabled -}}
+
+{{- if and $enabled $posts -}}
+    {{- $paginator := false -}}
+    {{- with $.Page.Param "list.paginate" -}}
+        {{- if gt . 1 -}}
+            {{- $paginator = $.Page.Paginate $posts . -}}
+        {{- end -}}
+    {{- end -}}
+    {{- if not $paginator -}}
+        {{- $paginator = $.Page.Paginate $posts -}}
+    {{- end -}}
+
+    {{- if $paginator_top -}}
+        {{- partial "render-paginator" . -}}
+    {{- end -}}
+    
+    {{- $paginated_posts := slice -}}
+    {{- range $paginator.Pages -}}
+        {{- $post_dict := dict "EntryPage" . "Params" .Params -}}
+        {{- $paginated_posts = $paginated_posts | append $post_dict -}}
+    {{- end -}}
+    
+    {{- $settings := dict -}}
+    {{- partial "render-preview-list" (dict "Page" $.Page "Entries" $paginated_posts "Partial" "preview-content" "Settings" $settings) -}}
+    
+    {{- if $paginator_bottom -}}
+        {{- partial "render-paginator" . -}}
+    {{- end -}}
+{{- end -}}

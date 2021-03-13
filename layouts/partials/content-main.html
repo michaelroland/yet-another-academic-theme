@@ -1,0 +1,31 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render main content sections with conditional authoring information.
+
+Context: The current content meta context of a page.
+
+*/ -}}
+{{- if .main -}}
+<article id="main-content" class="main-content">
+    {{- $authoringinfo_printed := false -}}
+    {{- range .main -}}
+        {{- with .heading -}}
+            {{- . | safeHTML -}}
+            {{- if not $authoringinfo_printed -}}
+                {{- $authoringinfo_printed = true -}}
+                {{- partial "render-authoringinfo" $ -}}
+            {{- end -}}
+        {{- end -}}
+        {{- with .content -}}
+            {{- . | safeHTML -}}
+        {{- end -}}
+    {{- end -}}
+</article>
+{{- end -}}

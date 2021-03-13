@@ -1,0 +1,46 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render a grouped list of content items.
+
+Param: Page         The current page context (may be omitted).
+Param: Entries      The list of content items (consisting of dicts with ".EntryPage"
+           and ".Params" fields).
+Param: Partial      The name of a partial that renders the list item.
+Param: GroupBy      List of parameter fields to group content items by.
+Param: HeaderLevel  The heading level of the first-level group header.
+Param: HeaderClass  A class attribute to apply to all group headers.
+Param: Settings     Optional dict of local scope (e.g. shortcodes, previews) settings.
+
+*/ -}}
+{{- $group_headers := apply $.GroupBy "string" "" -}}
+{{- $header_level := int $.HeaderLevel -}}
+{{- range $.Entries -}}
+    {{- $entry := partial "function-content-meta" (dict "Page" .EntryPage "Params" .Params "Settings" $.Settings) -}}
+    {{- range $level, $column := $.GroupBy -}}
+        {{- $header := "" -}}
+        {{- if eq $column "year" -}}
+            {{- $header = $entry.date.yyyy -}}
+        {{- else if eq $column "month" -}}
+            {{- $header = $entry.date.mmmm -}}
+        {{- else if eq $column "day" -}}
+            {{- $header = $entry.date.dd -}}
+        {{- else if eq $column "title" -}}
+            {{- $header = $entry.Page.Title -}}
+        {{- else if isset $entry.Params $column -}}
+            {{- $header = index $entry.Params $column -}}
+        {{- end -}}
+        {{- if ne $header (index $group_headers $level) -}}
+            {{- $group_headers = first $level $group_headers | append $header | append (after (add $level 1) (apply $.GroupBy "string" "")) -}}
+            {{- $header_level := $header_level | add $level -}}
+            {{- partial "render-heading" (dict "Page" $.Page "Level" $header_level "InnerHTML" ($header | htmlEscape) "Class" $.HeaderClass) -}}
+        {{- end -}}
+    {{- end -}}
+    {{- partial $.Partial (dict "Page" $.Page "Entry" $entry "Settings" $.Settings) -}}
+{{- end -}}

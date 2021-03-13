@@ -1,0 +1,31 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Renderer for advisor names in bibliographic citations.
+
+Context: The current publication data context.
+
+*/ -}}
+{{- $names := .advisors -}}
+{{- $link_names := .advisor_links -}}
+{{- $names_html := "" -}}
+{{- range $i, $o := $names.objects -}}
+    {{- if eq $i 0 -}}
+    {{- else if eq $i (sub $names.count 1) -}}
+        {{- $names_html = print $names_html $names.delimiter_last -}}
+    {{- else -}}
+        {{- $names_html = print $names_html $names.delimiter -}}
+    {{- end -}}
+    {{- if and $link_names $o.page -}}
+        {{- $names_html = print $names_html (partial "render-link" (dict "Page" $.Page "Destination" $o.page.RelPermalink "InnerHTML" ($o.abbrevname | htmlEscape))) -}}
+    {{- else -}}
+        {{- $names_html = print $names_html ($o.abbrevname | htmlEscape) -}}
+    {{- end -}}
+{{- end -}}
+{{- printf (T "advisor_names" .count) $names_html | safeHTML -}}

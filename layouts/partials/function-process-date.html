@@ -1,0 +1,72 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Function: Process date/timestamp into a date structure.
+
+Param: Date     The date/timestamp as string.
+
+Return: A date structure, whcih is a map that consists of
+    .date  The date in source format (".Date").
+    .yy    Year in 2-digit format.
+    .yyyy  Year in 4-digit format.
+    .m     Month as number.
+    .mm    Month padded to 2 digits with leading zeros.
+    .mmm   Month name (localized, abbreviated form).
+    .mmmm  Month name (localized, full form).
+    .d     Day of month as number.
+    .dd    Day of month padded to 2 digits with leading zeros.
+    .ddd   Day of week (localized, abbreviated form).
+    .dddd  Day of week (localized, full form).
+    .h     Hours (12h format).
+    .hh    Hours (12h format) padded to 2 digits with leading zeros.
+    .H     Hours (24h format).
+    .HH    Hours (24h format) padded to 2 digits with leading zeros.
+    .n     Minutes.
+    .nn    Minutes padded to 2 digits with leading zeros.
+    .s     Seconds.
+    .ss    Seconds padded to 2 digits with leading zeros.
+    .ampm  AM/PM indicator.
+    .zzz   Timezone name (abbreviated form).
+    .Z     Timezone (signed, in hours).
+    .ZZ    Timezone (signed, in hours, padded to 2 digits with leading zeros).
+    .ZZZZ  Timezone (signed, in hours and minutes, padded to 4 digits with leading zeros).
+
+*/ -}}
+{{- $date_str := .Date -}}
+
+{{- $date := dict "date" $date_str -}}
+{{- if $date_str -}}
+    {{- $date = merge $date (dict "yy" (dateFormat "06" $date_str) "yyyy" (dateFormat "2006" $date_str)) -}}
+    {{- $date = merge $date (dict "m" (dateFormat "1" $date_str) "mm" (dateFormat "01" $date_str)) -}}
+    {{- $month_i18n := dateFormat "Jan" $date_str -}}
+    {{- $date = merge $date (dict "mmm" (T $month_i18n (dict "abbrev" true)) "mmmm" (T $month_i18n)) -}}
+    {{- $date = merge $date (dict "d" (dateFormat "2" $date_str) "dd" (dateFormat "02" $date_str)) -}}
+    {{- $weekday_i18n := dateFormat "Mon" $date_str -}}
+    {{- $date = merge $date (dict "ddd" (T $weekday_i18n (dict "abbrev" true)) "dddd" (T $weekday_i18n)) -}}
+    {{- $date = merge $date (dict "h" (dateFormat "3" $date_str) "hh" (dateFormat "03" $date_str)) -}}
+    {{- $date = merge $date (dict "H" (dateFormat "15" $date_str) "HH" (dateFormat "15" $date_str)) -}}
+    {{- $date = merge $date (dict "n" (dateFormat "4" $date_str) "nn" (dateFormat "04" $date_str)) -}}
+    {{- $date = merge $date (dict "s" (dateFormat "5" $date_str) "ss" (dateFormat "05" $date_str)) -}}
+    {{- $date = merge $date (dict "ampm" (dateFormat "pm" $date_str)) -}}
+    {{- $date = merge $date (dict "zzz" (dateFormat "MST" $date_str) "Z" (dateFormat "-7" $date_str) "ZZ" (dateFormat "-07" $date_str) "ZZZZ" (dateFormat "-0700" $date_str)) -}}
+{{- else -}}
+    {{- $date = merge $date (dict "yy" nil "yyyy" nil) -}}
+    {{- $date = merge $date (dict "m" nil "mm" nil) -}}
+    {{- $date = merge $date (dict "mmm" nil "mmmm" nil) -}}
+    {{- $date = merge $date (dict "d" nil "dd" nil) -}}
+    {{- $date = merge $date (dict "ddd" nil "dddd" nil) -}}
+    {{- $date = merge $date (dict "h" nil "hh" nil) -}}
+    {{- $date = merge $date (dict "H" nil "HH" nil) -}}
+    {{- $date = merge $date (dict "n" nil "nn" nil) -}}
+    {{- $date = merge $date (dict "s" nil "ss" nil) -}}
+    {{- $date = merge $date (dict "ampm" nil) -}}
+    {{- $date = merge $date (dict "zzz" nil "Z" nil "ZZ" nil "ZZZZ" nil) -}}
+{{- end -}}
+
+{{- return $date -}}

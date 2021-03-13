@@ -1,0 +1,48 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Function: Setup external dependency configuration.
+
+Context: The current page context.
+
+*/ -}}
+{{- $styles := slice -}}
+{{- $scripts := slice -}}
+{{- $scripts_delayed := slice -}}
+
+{{- /* jQuery */ -}}
+{{- $ver := "3.6.0" -}}
+{{- $scripts = $scripts | append (dict "url" ((printf "libs/jquery-%[1]s/js/jquery-%[1]s.min.js?ver=%[1]s" $ver) | relURL)) -}}
+
+{{- /* Bootstrap */ -}}
+{{- $ver := "4.6.0" -}}
+{{- $styles = $styles | append (dict "url" ((printf "libs/bootstrap-%[1]s/css/bootstrap.min.css?ver=%[1]s" $ver) | relURL)) -}}
+{{- $scripts_delayed = $scripts_delayed | append (dict "url" ((printf "libs/bootstrap-%[1]s/js/bootstrap.bundle.min.js?ver=%[1]s" $ver) | relURL)) -}}
+
+{{- /* FontAwesome */ -}}
+{{- $ver := "5.15.2" -}}
+{{- $styles = $styles | append (dict "url" ((printf "libs/fontawesome-free-%[1]s/css/all.min.css?ver=%[1]s" $ver) | relURL)) -}}
+
+{{- /* Academicons */ -}}
+{{- $ver := "1.9.1" -}}
+{{- $styles = $styles | append (dict "url" ((printf "libs/academicons-%[1]s/css/academicons.min.css?ver=%[1]s" $ver) | relURL)) -}}
+
+{{- /* Theme */ -}}
+{{- $ver := "1.0.0" -}}
+{{- $styles = $styles | append (dict "url" ((printf "css/theme.css?ver=%[1]s" $ver) | relURL)) -}}
+{{- $scripts = $scripts | append (dict "url" ((printf "js/theme.js?ver=%[1]s" $ver) | relURL)) -}}
+{{- $scripts_delayed = $scripts_delayed | append (dict "url" ((printf "js/theme_delayed.js?ver=%[1]s" $ver) | relURL)) -}}
+
+{{- /* Site-specific overrides */ -}}
+{{- $styles = $styles | append (dict "url" ("css/site.css" | relURL)) -}}
+{{- $scripts = $scripts | append (dict "url" ("js/site.js" | relURL)) -}}
+{{- $scripts_delayed = $scripts_delayed | append (dict "url" ("js/site_delayed.js" | relURL)) -}}
+
+{{- $deps := dict "styles" $styles "scripts" $scripts "scripts_delayed" $scripts_delayed -}}
+{{- return $deps -}}

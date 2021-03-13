@@ -1,0 +1,25 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Default bibliographic citation renderer.
+
+Context: The current publication data context.
+
+*/ -}}
+{{- partial "citation-include-author-eds-org-title" . -}}
+{{- with .howpublished -}}
+, <span class="howpublished">{{ . | markdownify }}</span>
+{{- end -}}
+{{- with .thepages -}}
+, <span class="pages">{{ . }}</span>
+{{- end -}}
+{{- with .thedate.yyyy -}}
+, <span class="year">{{ . }}</span>
+{{- end -}}
+{{- partial "citation-include-refs" . -}}

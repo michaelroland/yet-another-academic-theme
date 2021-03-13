@@ -1,0 +1,62 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Bibliographic citation renderer for talks.
+
+Context: The current publication data context.
+
+*/ -}}
+<span class="title">{{ printf "\"%s\"" .title | markdownify }}</span>
+{{- if gt .authors.count 0 -}}
+{{ T "presented_by" }} <span class="presenter">{{ partial "citation-include-authorlist-talk" . }}</span>
+{{- end -}}
+.
+{{- $talk_types := slice -}}
+{{- $talk_types := $talk_types | append (dict "type" "workshop"     "title" (T "workshop")) -}}
+{{- $talk_types := $talk_types | append (dict "type" "invited"      "title" (T "invited_talk")) -}}
+{{- $talk_types := $talk_types | append (dict "type" "keynote"      "title" (T "keynote")) -}}
+{{- $talk_types := $talk_types | append (dict "type" "guestlecture" "title" (T "guest_lecture")) -}}
+{{- $talk_types := $talk_types | append (dict "type" "moderation"   "title" (T "moderation")) -}}
+{{- $talk_type := "" -}}
+{{- if .talk_type -}}
+    {{- range $talk_types -}}
+        {{- if eq $.talk_type .type -}}
+            {{- $talk_type = .title -}}
+        {{- end -}}
+    {{- end -}}
+    {{- if not $talk_type }}
+        {{- $talk_type = .talk_type | markdownify -}}
+    {{- end -}}
+{{- else -}}
+    {{- range $talk_types -}}
+        {{- if hasPrefix $.subtype .type -}}
+            {{- $talk_type = .title -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+{{- if $talk_type }}
+<span class="type">{{ $talk_type }}</span>,
+{{- end -}}
+{{- with .howpublished }}
+<span class="howpublished">{{ . | markdownify }}</span>,
+{{- end -}}
+{{- with .event.title }}
+<span class="event">{{ . | markdownify }}</span>,
+{{- end -}}
+{{- with .institution }}
+<span class="institution">{{ . | markdownify }}</span>,
+{{- end -}}
+{{- with .event.location }}
+<span class="location">{{ . | markdownify }}</span>,
+{{- end }}
+<span class="date">{{ T "date_format" .thedate }}</span>
+{{- with .note -}}
+. <span class="note">{{ . | markdownify }}</span>
+{{- end -}}
+.

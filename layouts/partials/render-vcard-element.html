@@ -1,0 +1,70 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render a vcard attribute element.
+
+Param: Page            The current page context (may be omitted).
+Param: Type            The attribute type.
+Param: Icon            The attribute icon.
+Param: HideIcon        Set true to hide the icon.
+Param: Value           The attribute value.
+Param: SecondaryValue  Optional secondary attribute value.
+
+*/ -}}
+{{- $elements := where site.Data.theme.vcard.elements "type" .Type -}}
+{{- $values := .Value -}}
+{{- if and $values (not (reflect.IsSlice $values)) -}}
+    {{- $values = slice $values -}}
+{{- else if not $values -}}
+    {{- $values = slice -}}
+{{- end -}}
+{{- $secondary_values := .SecondaryValue -}}
+{{- if and $secondary_values (not (reflect.IsSlice $secondary_values)) -}}
+    {{- $secondary_values = slice $secondary_values -}}
+{{- else if not $secondary_values -}}
+    {{- $secondary_values = slice -}}
+{{- end -}}
+{{- $inner_html := slice -}}
+{{- $element := dict -}}
+{{- if $elements -}}
+    {{- $element = index $elements 0 -}}
+{{- else -}}
+    {{- $element = dict "type" .Type "is_url" false -}}
+{{- end -}}
+{{- with .Icon -}}
+    {{- $element = merge $element (dict "icon" .) -}}
+{{- end -}}
+{{- range $i, $v := $values -}}
+    {{- if $element.is_url -}}
+        {{- with $element.url_prefix -}}
+            {{- $v = printf "%s%s" . $v -}}
+        {{- end -}}
+        {{- $v = partial "render-link" (dict "Page" $.Page "Destination" $v "AllowUrlAttrs" true) -}}
+    {{- end -}}
+    {{- if isset $secondary_values $i -}}
+        {{- $sv := index $secondary_values $i -}}
+        {{- if and $v $sv -}}
+            {{- $v = printf "%s, " $v -}}
+        {{- end -}}
+        {{- if $sv -}}
+            {{- $v = printf "%s<span class=%q>%s</span>" $v "text-secondary" $sv -}}
+        {{- end -}}
+    {{- end -}}
+    {{- $inner_html = $inner_html | append $v -}}
+{{- end -}}
+{{- if .HideIcon -}}
+<div class="vcard-element-text {{ with $element.type }}vcard-{{ . }}{{ end }}">
+    {{- with $inner_html -}}{{- delimit . "<br>" | safeHTML -}}{{- end -}}
+</div>
+{{- else -}}
+<div class="vcard-element {{ with $element.type }}vcard-{{ . }}{{ end }}">
+    <div class="vcard-icon">{{- with $element.icon -}}<i class="{{ . }}"></i>{{- end -}}</div>
+    <div class="vcard-text">{{- with $inner_html -}}{{- delimit . "<br>" | safeHTML -}}{{- end -}}</div>
+</div>
+{{- end -}}

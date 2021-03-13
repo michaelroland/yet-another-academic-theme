@@ -1,0 +1,43 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Shortcode: Print an e-mail address as hyperlink.
+
+Note: This shortcode expects an ".Inner" body and, therefore, needs to be closed.
+
+Param 0: address      The destination e-mail address (may include query parameters and attributes as allowed by the link renderer).
+Param 1: title        Optional display title (only used if ".Inner" is empty).
+Param: class          Optional class attribute for link.
+Param: style          Optional style attribute for link.
+Inner: Display text for the link (defaults to "title" if empty).
+
+*/ -}}
+{{- $url := .Get (cond .IsNamedParams "address" 0) -}}
+{{- $class := "" -}}
+{{- $style := "" -}}
+
+{{- if .IsNamedParams -}}
+    {{- with .Get "class" -}}
+        {{- $class = . -}}
+    {{- end -}}
+    {{- with .Get "style" -}}
+        {{- $style = . -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $inner_html := "" -}}
+{{- with .Inner -}}
+    {{- $inner_html = . -}}
+{{- else -}}
+    {{- with .Get (cond .IsNamedParams "title" 1) -}}
+        {{- $inner_html = . -}}
+    {{- end -}}
+{{- end -}}
+
+{{- partial "render-link" (dict "Page" .Page "Destination" $url "Class" $class "Style" $style "InnerHTML" $inner_html "AllowUrlAttrs" true) -}}

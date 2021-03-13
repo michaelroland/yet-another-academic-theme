@@ -1,0 +1,63 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Shortcode: Print a hyperlink.
+
+Note: This shortcode expects an ".Inner" body and, therefore, needs to be closed.
+
+Param 0: href         The destination URL, page path, or page resource name.
+Param 1: title        Optional link title attribute.
+Param 2:              Optional string consisting of attributes (target, rel, class) as allowed by the link renderer.
+Param: target         Optional link target attribute.
+Param: rel            Optional link rel attribute.
+Param: class          Optional class attribute for link.
+Param: style          Optional style attribute for link.
+Inner: Display text for the link (defaults to the "title" attribute if empty).
+
+*/ -}}
+{{- $url := "" -}}
+{{- $allow_url_attrs := true -}}
+{{- $title := "" -}}
+{{- $target := "" -}}
+{{- $rel := "" -}}
+{{- $class := "" -}}
+{{- $style := "" -}}
+
+{{- with .Get (cond .IsNamedParams "href" 0) -}}
+    {{- $url = . -}}
+{{- end -}}
+{{- with .Get (cond .IsNamedParams "title" 1) -}}
+    {{- $title = . -}}
+{{- end -}}
+{{- if .IsNamedParams -}}
+    {{- $allow_url_attrs := false -}}
+    {{- with .Get "target" -}}
+        {{- $target = . -}}
+    {{- end -}}
+    {{- with .Get "rel" -}}
+        {{- $rel = . -}}
+    {{- end -}}
+    {{- with .Get "class" -}}
+        {{- $class = . -}}
+    {{- end -}}
+    {{- with .Get "style" -}}
+        {{- $style = . -}}
+    {{- end -}}
+{{- else -}}
+    {{- with .Get 2 -}}
+        {{- $url = printf "%s|%s" . $url -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $inner_html := "" -}}
+{{- with .Inner -}}
+    {{- $inner_html = . -}}
+{{- end -}}
+
+{{- partial "render-link" (dict "Page" .Page "Destination" $url "Title" $title "Target" $target "Rel" $rel "Class" $class "Style" $style "InnerHTML" $inner_html "AllowUrlAttrs" $allow_url_attrs) -}}

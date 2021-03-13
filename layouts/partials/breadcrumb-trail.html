@@ -1,0 +1,71 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render the breadcrumb trail.
+
+Context: The current page context.
+
+*/ -}}
+{{- $breadcrumb_show := $.Param "breadcrumb" -}}
+{{- $url := replace .Permalink $.Site.Home.Permalink "" -}}
+{{- $url = trim $url "/" -}}
+{{- if and $breadcrumb_show $url -}}
+<div class="row">
+    <nav id="main-breadcrumb" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+        {{- with $.Site.Home -}}
+            <li class="breadcrumb-item breadcrumb-home">
+            {{- $target_url := .RelPermalink -}}
+            {{- $allow_url_attrs := false -}}
+            {{- with .Params.target -}}
+                {{- $target_url = . -}}
+                {{- $allow_url_attrs = true -}}
+            {{- end -}}
+            {{- partial "render-link" (dict "Page" $.Page "Destination" $target_url "Title" .LinkTitle "InnerHTML" "<i class=\"fas fa-home\"></i>" "AllowUrlAttrs" $allow_url_attrs) -}}
+            </li>
+        {{- end -}}
+        {{- $breadcrumb_depth := $.Param "breadcrumb_depth" -}}
+        {{- if not $breadcrumb_depth -}}
+            {{- $breadcrumb_depth = 3 -}}
+        {{- end }}
+        {{- $breadcrumb_depth = $breadcrumb_depth | add -1 -}}
+        {{- $breadcrumb_pages := slice -}}
+        {{- $breadcrumb_url := "" -}}
+        {{- range split $url "/" -}}
+            {{- if . -}}
+                {{- $breadcrumb_url = print $breadcrumb_url "/" . -}}
+                {{- with $.Site.GetPage $breadcrumb_url }}
+                    {{ if ne . $.Page }}
+                        {{- $breadcrumb_pages = $breadcrumb_pages | append . -}}
+                    {{- end -}}
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}
+        {{- $breadcrumb_count := len $breadcrumb_pages -}}
+        {{- if lt $breadcrumb_count $breadcrumb_depth -}}
+            {{- $breadcrumb_depth = $breadcrumb_count -}}
+        {{- else if gt $breadcrumb_count $breadcrumb_depth -}}
+                <li class="breadcrumb-item">{{ T "ellipsis" }}</a></li>
+        {{- end -}}
+        {{- range $breadcrumb_pages | after (sub (len $breadcrumb_pages) $breadcrumb_depth) -}}
+            <li class="breadcrumb-item">
+            {{- $target_url := .RelPermalink -}}
+            {{- $allow_url_attrs := false -}}
+            {{- with .Params.target -}}
+                {{- $target_url = . -}}
+                {{- $allow_url_attrs = true -}}
+            {{- end -}}
+            {{- partial "render-link" (dict "Page" $.Page "Destination" $target_url "Title" "" "InnerHTML" .LinkTitle "AllowUrlAttrs" $allow_url_attrs) -}}
+            </li>
+        {{- end -}}
+            <li class="breadcrumb-item active">{{ .LinkTitle }}</li>
+        </ol>
+    </nav>
+</div>
+{{- end -}}

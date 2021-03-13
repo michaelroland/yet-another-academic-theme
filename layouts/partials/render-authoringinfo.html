@@ -1,0 +1,38 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render authoring information of a page.
+
+Context: The current content meta context of a page.
+
+*/ -}}
+{{- if .display_date -}}
+    {{- if .moddate.date -}}
+    <div class="authored-date pr-3 d-flex flex-row">
+        <div class="pr-2"><i class="fas fa-calendar fa-fw"></i></div>
+        <div class="d-flex flex-row flex-wrap">
+            <div>{{ T "posted_on" }} {{ T "date_format_short" .date }}</div>
+            {{- if ne .date.date .moddate.date -}}
+            <div class="px-2">&bullet;</div>
+            <div>{{ T "last_updated_on" }} {{ T "date_format_short" .moddate }}</div>
+            {{- end -}}
+        </div>
+    </div>
+    {{- end -}}
+{{- end -}}
+{{- if .display_authors -}}
+    {{- if gt .authors.count 0 -}}
+    <div class="author pr-3 d-flex flex-row">
+        <div class="pr-2"><i class="fas fa-user-circle fa-fw"></i></div>
+        <div class="d-flex flex-row flex-wrap">
+            <div>{{ T "authored_by" }} {{ partial "render-authorlist" . }}</div>
+        </div>
+    </div>
+    {{- end -}}
+{{- end -}}

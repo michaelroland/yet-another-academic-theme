@@ -1,0 +1,31 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render the main part of a bundle list page.
+
+Context: The current page context.
+
+*/ -}}
+{{- $pagedata := partial "function-content-meta" (dict "Page" .Page "Params" .Params) -}}
+{{- $sidebarwidgets := partial "function-prepare-sidebar-widgets" (dict "Page" .Page "Params" .Params) -}}
+
+<main id="main" class="container-fluid px-0 {{ $.Type }} {{ $.Kind }} {{ $.Type }}-{{ with $pagedata.uniqueid }}{{ . }}{{ else }}none{{ end }}">
+    {{- partial "content-featured" $pagedata -}}
+    <div class="container container-fluid-lg">
+        {{- partial "breadcrumb-trail" . -}}
+        <div class="row">
+            <div class="col-12{{ if $sidebarwidgets.sidebar_show }} col-md-9{{ end }} mb-3">
+                {{- partial "content-main" $pagedata -}}
+                {{- partial "content-list" $pagedata -}}
+                {{- partial "content-supplementary" $pagedata -}}
+            </div>
+            {{- partial "sidebar-widgets" (dict "SidebarWidgets" $sidebarwidgets "Page" .Page "Params" .Params) -}}
+        </div>
+    </div>
+</main>

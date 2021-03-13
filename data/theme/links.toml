@@ -1,0 +1,61 @@
+## Theme configuration: Hyperlinks
+## 
+##  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+##  
+##  This Source Code Form is subject to the terms of the Mozilla Public
+##  License, v. 2.0. If a copy of the MPL was not distributed with this
+##  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+## 
+
+default_type = "link"
+
+[types.link]
+  icon = "fas fa-bookmark"
+
+[types.permalink]
+  icon = "fas fa-link"
+
+[types.fulltext]
+  icon = "fas fa-file-alt"
+
+[types.slides]
+  icon = "fas fa-desktop"
+
+[types.slideshare]
+  icon = "fab fa-slideshare"
+
+[types.video]
+  icon = "fas fa-file-video"
+
+[types.youtube]
+  icon = "fab fa-youtube"
+
+[types.vimeo]
+  icon = "fab fa-vimeo"
+
+[types.audio]
+  icon = "fas fa-file-audio"
+
+[types.dataset]
+  icon = "fas fa-archive"
+
+[types.file]
+  icon = "fas fa-file"
+
+[types.school]
+  icon = "fas fa-university"
+
+[types.award]
+  icon = "fas fa-trophy"
+
+[types.bugreport]
+  icon = "fas fa-bug"
+
+[types.buy]
+  icon = "fas fa-shopping-cart"
+
+[types.bibtex]
+  icon = "fas fa-quote-left"
+
+[types.more]
+  icon = "fas fa-plus-circle"

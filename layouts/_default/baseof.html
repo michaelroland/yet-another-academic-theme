@@ -1,0 +1,41 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{{- with .GitInfo }}
+    {{ printf "<!-- Built on %s from version %s@%s -->" (now.UTC.Format "2006-01-02T15:04:05Z07:00") .AbbreviatedHash (.AuthorDate.UTC.Format "2006-01-02T15:04:05Z07:00") | safeHTML }}
+{{- else }}
+    {{ printf "<!-- Built on %s -->" (now.UTC.Format "2006-01-02T15:04:05Z07:00") | safeHTML }}
+{{- end }}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{{- with .Params -}}{{- with .target }}
+    {{ printf "<meta http-equiv=%q content=%q>" "refresh" (printf "0;URL=%s" .) | safeHTML }}
+{{- end -}}{{- end }}
+
+<title>{{ block "title" . }}{{ .Site.Title }}{{ end }}</title>
+    
+{{ partial "favicon.html" . }}
+
+{{ partial "includes-header.html" . }}
+</head>
+<body role="document">
+
+{{ block "header" . }}
+{{ end }}
+
+{{ block "main" . }}
+{{ end }}
+
+{{ block "footer" . }}
+{{ end }}
+
+{{- partial "includes-footer.html" . }}
+</body>
+</html>

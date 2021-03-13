@@ -1,0 +1,194 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render a link as an HTML <a> element.
+
+Param: Page             The current page context (may be omitted).
+Param: Destination      The destination URL, page path, or page resource name.
+Param: InnerHTML        Optional inner HTML for the <a> element.
+Param: Title            Optional link title attribute (also used as inner HTML if
+           "InnerHTML" is omitted).
+Param: Target           Optional link target attribute.
+Param: Rel              Optional link rel attribute.
+Param: Class            Optional class attribute for the <a> element.
+Param: Style            Optional style attribute for the <a> element.
+Param: OtherAttrs       Optional custom additional attributes for the <a> element.
+Param: AllowUrlAttrs    If true, allow target, rel, and class attributes as prefix in
+           the "Destination" parameter; defaults to false.
+
+*/ -}}
+{{- $url := .Destination -}}
+{{- $allow_url_attrs := false -}}
+{{- $title := "" -}}
+{{- $target := "" -}}
+{{- $has_target := false -}}
+{{- $rel := slice -}}
+{{- $rel_ignore := slice -}}
+{{- $class := "" -}}
+{{- $style := "" -}}
+
+{{- $config_html_attr_rel := site.Data.theme.html_attr.rel -}}
+{{- $config_html_attr_rel_ignorable := site.Data.theme.html_attr.rel_ignorable -}}
+{{- $config_links_external_use_target_blank := true -}}
+{{- $config_links_external_use_noopener := true -}}
+{{- $config_links_external_use_nofollow := true -}}
+{{- with .Page -}}
+    {{- $config_links_external_use_target_blank = .Param "links_external_use_target_blank" -}}
+    {{- $config_links_external_use_noopener = .Param "links_external_use_noopener" -}}
+    {{- $config_links_external_use_nofollow = .Param "links_external_use_nofollow" -}}
+{{- end -}}
+
+{{- with .Title -}}
+    {{- $title = . -}}
+{{- end -}}
+
+{{- with .Target -}}
+    {{- $target = . -}}
+    {{- $has_target = true -}}
+{{- end -}}
+
+{{- with .Rel -}}
+    {{- range split . "," -}}
+        {{- range split . " " -}}
+            {{- if in $config_html_attr_rel . -}}
+                {{- $rel = $rel | union (slice .) -}}
+            {{- else if index $config_html_attr_rel_ignorable . -}}
+                {{- $rel_ignore = $rel_ignore | append (index $config_html_attr_rel_ignorable .) -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+{{- with .Class -}}
+    {{- $class = . -}}
+{{- end -}}
+
+{{- with .Style -}}
+    {{- $style = . -}}
+{{- end -}}
+
+{{- with .AllowUrlAttrs -}}
+    {{- $allow_url_attrs = . -}}
+{{- end -}}
+
+{{- if and $allow_url_attrs (in $url "|") -}}
+    {{- $attrs := delimit (split $url "|" | first 1) "" -}}
+    {{- $url = delimit (split $url "|" | after 1) "|" -}}
+    {{- range split $attrs "," -}}
+        {{- if in $config_html_attr_rel . -}}
+            {{- $rel = $rel | union (slice .) -}}
+        {{- else if index $config_html_attr_rel_ignorable . -}}
+            {{- $rel_ignore = $rel_ignore | append (index $config_html_attr_rel_ignorable .) -}}
+        {{- else if hasPrefix . "class=" -}}
+            {{- $class = split . "class=" | after 1 | delimit "" -}}
+        {{- else -}}
+            {{- $target = . -}}
+            {{- $has_target = true -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $url_rel := $url | relURL -}}
+{{- $url_abs := $url | absURL -}}
+{{- $url_display := $url_abs -}}
+{{- $url_asis := false -}}
+
+{{- range (slice "mailto:" "tel:" "callto:" "im:" "skype:" "sms:") -}}
+    {{- if hasPrefix $url . -}}
+        {{- $url_rel = $url -}}
+        {{- $url_rel = printf "%s%s" ($url | replaceRE "\\?.*$" "" | replaceRE "\\s" "") ($url | replaceRE "^.*(\\?)?" "") -}}
+        {{- $url_abs = $url_rel -}}
+        {{- $url_display = strings.TrimPrefix . $url -}}
+        {{- $url_display = $url_display | replaceRE "\\?.*$" "" -}}
+        {{- $url_asis = true -}}
+        {{- if not $class -}}
+            {{- if eq . "mailto:" -}}
+                {{- $class = "mailto" -}}
+            {{- else if or (eq . "tel:") (eq . "callto:") -}}
+                {{- $class = "phoneto" -}}
+            {{- else -}}
+                {{- $class = printf "%sto" (. | replaceRE ":$" "") -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+{{- if not $url_asis -}}
+    {{- with .Page -}}
+        {{- with .Resources.GetMatch $url -}}
+            {{- $url_rel = .RelPermalink -}}
+            {{- $url_abs = .Permalink -}}
+            {{- $url_display = .Title -}}
+        {{- else -}}
+            {{- $url := strings.TrimPrefix .Site.LanguagePrefix $url -}}
+            {{- $page := . -}}
+            {{- if eq "" $url -}}
+            {{- else if eq "/" $url -}}
+                {{- $page = .Site.Home -}}
+                {{- if not $page -}}
+                    {{- $page = .Sites.First.Home -}}
+                {{- end -}}
+            {{- else if eq "/" (substr $url 0 1) -}}
+                {{- $url = strings.TrimSuffix "/" $url -}}
+                {{- $page = .Site.GetPage $url -}}
+                {{- if not $page -}}
+                    {{- $page = .Sites.First.GetPage $url -}}
+                {{- end -}}
+            {{- else -}}
+                {{- $url = strings.TrimSuffix "/" $url -}}
+                {{- $page = .GetPage $url -}}
+                {{- if not $page -}}
+                    {{- $page = (index .AllTranslations 0).GetPage $url -}}
+                {{- end -}}
+            {{- end -}}
+            {{- with $page -}}
+                {{- $pagemeta := partial "function-content-meta" (dict "Page" . "Params" .Params) -}}
+                {{- $url_rel = $pagemeta.permalink -}}
+                {{- $url_abs = $pagemeta.permalink | absURL -}}
+                {{- $url_display = .LinkTitle -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+{{- if eq $url_rel $url_abs -}}
+    {{- if $config_links_external_use_target_blank -}}
+        {{- if not $has_target -}}
+            {{- $target = "_blank" -}}
+            {{- $has_target = true -}}
+        {{- end -}}
+    {{- end -}}
+    {{- if $config_links_external_use_noopener -}}
+        {{- $rel = $rel | union (slice "noopener") -}}
+    {{- end -}}
+    {{- if $config_links_external_use_nofollow -}}
+        {{- $rel = $rel | union (slice "nofollow") -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $rel = $rel | complement $rel_ignore -}}
+
+<a href="{{ $url_rel | safeURL }}"
+   {{- with $target }}{{ if in (slice "_download" "download") . }} download{{ else }} target="{{ . }}"{{ end }}{{ end -}}
+   {{- with $rel }} rel="{{ delimit . " " }}"{{ end -}}
+   {{- with $title }} title="{{ . }}"{{ end -}}
+   {{- with $class }} class="{{ . }}"{{ end -}}
+   {{- with $style }} style="{{ . | safeCSS }}"{{ end -}}
+   {{- with .OtherAttrs }} {{ . | safeHTMLAttr }}{{ end -}}
+>
+    {{- with .InnerHTML -}}
+        {{- . | safeHTML -}}
+    {{- else -}}
+        {{- with $title -}}
+            {{- . | safeHTML -}}
+        {{- else -}}
+            {{- $url_display -}}
+        {{- end -}}
+    {{- end -}}
+</a>

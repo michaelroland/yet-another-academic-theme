@@ -1,0 +1,34 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{ printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?>" | safeHTML }}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+{{- range where .Data.Pages ".Params.hidden" "!=" true -}}
+  {{- $pagedata := partial "function-content-meta" (dict "Page" . "Params" .Params) -}}
+  {{- if and $pagedata.is_regular_page (not $pagedata.is_referal_page) }}
+  <url>
+    <loc>{{ .Permalink }}</loc>
+    {{- with $pagedata.moddate.date }}
+    <lastmod>{{ dateFormat "2006-01-02T15:04:05-07:00" . | safeHTML }}</lastmod>
+    {{- end -}}
+    {{- with .Sitemap.ChangeFreq }}
+    <changefreq>{{ . }}</changefreq>
+    {{- end -}}
+    {{- if ge .Sitemap.Priority 0.0 }}
+    <priority>{{ .Sitemap.Priority }}</priority>
+    {{- end -}}
+    {{- if .IsTranslated }}
+    <xhtml:link rel="alternate" hreflang="{{ .Lang }}" href="{{ .Permalink }}" />
+        {{- range .Translations }}
+    <xhtml:link rel="alternate" hreflang="{{ .Lang }}" href="{{ .Permalink }}" />
+        {{- end }}
+    {{- end }}
+  </url>
+  {{- end -}}
+{{- end }}
+</urlset>

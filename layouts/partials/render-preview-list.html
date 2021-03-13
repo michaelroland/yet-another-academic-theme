@@ -1,0 +1,53 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render a preview list of content items.
+
+Param: Page         The current page context (may be omitted).
+Param: Entries      The list of content items (consisting of dicts with ".EntryPage"
+           and ".Params" fields).
+Param: Partial      The name of a partial that renders the preview of a list item.
+Param: Settings     Optional dict of local scope (e.g. shortcodes, previews) settings.
+
+Settings:
+    max_columns
+
+Page-level Params:
+    list.max_columns
+
+*/ -}}
+{{- $display_authors := false -}}
+{{- $display_date := false -}}
+{{- $max_columns := int site.Data.theme.preview_list.max_columns -}}
+{{- with $.Page -}}
+    {{- with .Param "list.max_columns" -}}
+        {{- $max_columns = int . -}}
+    {{- end -}}
+{{- end -}}
+{{- with $.Settings -}}
+    {{- if isset . "max_columns" -}}
+        {{- $max_columns = int .max_columns -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $column_classes := site.Data.theme.preview_list.column_breakpoints.default -}}
+{{- with $max_columns -}}
+    {{- if isset site.Data.theme.preview_list.column_breakpoints . -}}
+        {{- $column_classes = index site.Data.theme.preview_list.column_breakpoints . -}}
+    {{- end -}}
+{{- end -}}
+
+<div class="row justify-content-start post-preview-list">
+{{- range $.Entries -}}
+    {{- $entry := partial "function-content-meta" (dict "Page" .EntryPage "Params" .Params "Settings" $.Settings) -}}
+    <div class="col-12{{ with $column_classes }} {{ . }}{{ end }}">
+    {{- partial $.Partial (dict "Page" $.Page "Entry" $entry "Settings" $.Settings) -}}
+    </div>
+{{- end -}}
+</div>

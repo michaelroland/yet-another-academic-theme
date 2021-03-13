@@ -1,0 +1,24 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Shortcode: Container for a set of columns.
+
+Note: This shortcode expects an ".Inner" body and, therefore, needs to be closed.
+
+Param 0: cols  The total number of columns (this column will span 12 / N bootstrap columns).
+Param 1:       An optional minimum breakpoint required to display multiple columns side-by-side.
+Param 2...:    Repeat param 0 and param 1 for multiple breakpoints.
+Inner: Content wrapped in a set of columns (see "column" shortcode).
+
+*/ -}}
+<div class="row">
+{{- with .Inner -}}
+    {{- . -}}
+{{- end -}}
+</div>

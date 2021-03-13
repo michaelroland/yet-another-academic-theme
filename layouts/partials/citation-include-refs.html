@@ -1,0 +1,24 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Renderer for additional bibliographic identifiers.
+
+Context: The current publication data context.
+
+*/ -}}
+{{- with .isbn -}}
+. <span class="isbn">{{ replace (T "isbn" (dict "isbn" .)) "-" "-\u200B" }}</span>
+{{- end -}}
+{{- with .issn -}}
+. <span class="issn">{{ replace (T "issn" (dict "issn" .)) "-" "-\u200B" }}</span>
+{{- end -}}
+{{- with .note -}}
+. <span class="note">{{ . | markdownify }}</span>
+{{- end -}}
+.

@@ -1,0 +1,53 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render an image as an HTML <figure> element.
+
+Param: Page             The current page context (may be omitted).
+Param: Destination      The image URL or page resource name.
+Param: Caption          Optional figure caption.
+Param: AltText          Alternate text attribute (defaults to an empty string or the resource title).
+Param: Title            Title attribute (defaults to an empty string or the resource title).
+Param: Width            Optional image width attribute.
+Param: Height           Optional image height attribute.
+Param: Class            Optional class attribute for the <figure> element.
+Param: Float            Optional float-style class attribute (e.g. "left" for "float-left").
+Param: Style            Optional style attribute for the <figure> element.
+Param: OtherAttrs       Optional custom additional attributes for the <figure> element.
+Param: ImgClass         Optional class attribute for the embedded <img> element.
+Param: ImgStyle         Optional style attribute for the embedded <img> element.
+Param: OtherImgAttrs    Optional custom additional attributes for embedded the <img> element.
+
+*/ -}}
+{{- $class := "" -}}
+{{- $style := "" -}}
+
+{{- with .Class -}}
+    {{- $class = . -}}
+{{- end -}}
+
+{{- with .Float -}}
+    {{- $class = printf "%s float-%s" $class . -}}
+{{- end -}}
+
+{{- with .Style -}}
+    {{- $style = . -}}
+{{- end -}}
+
+<figure class="block-figure{{ with $class }} {{ . }}{{ end }}"
+        {{- with $style }} style="{{ . | safeCSS }}"{{ end -}}
+        {{- with .OtherAttrs }} {{ . | safeHTMLAttr }}{{ end -}}
+>
+    {{- partial "render-image" (merge . (dict "Float" "" "Class" .ImgClass "Style" .ImgStyle "OtherAttrs" .OtherImgAttrs)) -}}
+    {{- with .Caption -}}
+    <figcaption>
+        {{- . | safeHTML -}}
+    </figcaption>
+    {{- end -}}
+</figure>

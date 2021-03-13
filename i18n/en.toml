@@ -1,0 +1,271 @@
+## Translation: English
+## 
+##  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+##  
+##  This Source Code Form is subject to the terms of the Mozilla Public
+##  License, v. 2.0. If a copy of the MPL was not distributed with this
+##  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+## 
+
+[abbrevname]
+other = "{{ with .firstinitials }}{{ . }} {{ end }}{{ .lastname }}"
+
+[abstract]
+other = "Abstract"
+
+[advisor_names]
+one = "Advisor: %s"
+other = "Advisors: %s"
+
+[article_number]
+other = "Article&nbsp;{{ .number }}"
+
+[arxiv]
+other = "arXiv{{ with .arxiv }}:{{ . }}{{ end }}"
+
+[arxiv_uri]
+other = "https://arxiv.org/abs/{{ .arxiv }}"
+
+[audio]
+other = "audio"
+
+[authored_by]
+other = "by"
+
+[bachelor_thesis]
+other = "Bachelor's thesis"
+
+[bibtex]
+other = "BibTeX"
+
+[book_edition]
+other = "{{ .humanized_edition }}&nbsp;ed."
+
+[book_volume]
+other = "vol.&nbsp;{{ .volume }}"
+
+[bug_report]
+other = "Bug report"
+
+[chapter_number]
+other = "Chapter&nbsp;{{ .number }}"
+
+[copyright]
+other = "Copyright &copy;"
+
+[date_format]
+other = "{{ with .dd }}{{ . }}{{ end }}{{ if .m2 }} {{ .mmmm }}{{ if .yyyy2 }} {{ .yyyy }}{{ end }} {{ end }}{{ if .d2 }}--{{ if .m2 }} {{ end }}{{ .dd2 }}{{ end }}{{ if .m2 }} {{ .mmmm2 }}{{ else }} {{ .mmmm }}{{ end }}{{ if .yyyy2 }} {{ .yyyy2 }}{{ else }} {{ .yyyy }}{{ end }}"
+#other = "{{ with .dd }}{{ . }} {{ end }}{{ if .m2 }}{{ .mmmm }}{{ if .yyyy2 }} {{ .yyyy }}{{ end }} {{ end }}{{ if .d2 }}-- {{ .dd2 }} {{ end }}{{ if .m2 }}{{ .mmmm2 }} {{ else }}{{ .mmmm }} {{ end }}{{ if .yyyy2 }}{{ .yyyy2 }}{{ else }}{{ .yyyy }}{{ end }}"
+
+[date_format_short]
+other = "{{ with .yyyy }}{{ . }}{{ end }}{{ with .mm }}-{{ . }}{{ end }}{{ with .dd }}-{{ . }}{{ end }}"
+
+[diploma_thesis]
+other = "Diploma thesis"
+
+[doi]
+other = "DOI{{ with .doi }} {{ . }}{{ end }}"
+
+[doi_uri]
+other = "https://doi.org/{{ .doi }}"
+
+[ellipsis]
+other = "..."
+
+[editor_names]
+one = "%s (Ed.)"
+other = "%s (Eds.)"
+
+[error_404_guidance]
+other = "You can return to <a href=\"{{ .Site.Home.RelPermalink }}\">{{ .Site.Home.LinkTitle }}</a>{{ with .Site.GetPage \"./sitemap\" }}, browse the <a href=\"{{ .RelPermalink }}\">{{ .LinkTitle }}</a>,{{ end }} or use the menu above."
+
+[error_404_info]
+other = "Sorry, the page you requested does not exist or is inaccessible. The URL may be misspelled or the page you are looking for is no longer available."
+
+[error_404_title]
+other = "Page not found"
+
+[evaluation_report]
+other = "Evaluation report"
+
+[event]
+other = "Event"
+
+[external]
+other = ""
+
+[fullname]
+other = "{{ with .firstname }}{{ . }} {{ end }}{{ .lastname }}"
+
+[fullnames_delimiter]
+other = "{{ with .two }} and {{ else }}, {{ with .last }}and {{ end }}{{ end }}"
+
+[fulltext]
+other = "fulltext"
+
+[guest_lecture]
+other = "Guest lecture"
+
+[in_collection]
+other = ", in"
+
+[in_journal]
+other = ","
+
+[invited_talk]
+other = "Invited talk"
+
+[isbn]
+other = "ISBN{{ with .isbn }} {{ . }}{{ end }}"
+
+[issn]
+other = "ISSN{{ with .issn }} {{ . }}{{ end }}"
+
+[issn_uri]
+other = "https://portal.issn.org/resource/ISSN/{{ .issn }}"
+
+[journal_volume]
+other = "{{ .volume }}"
+
+[keynote]
+other = "Keynote"
+
+[last_updated_on]
+other = "Last updated on"
+
+[lccn]
+other = "LCCN{{ with .lccn }} {{ . }}{{ end }}"
+
+[lccn_uri]
+other = "https://lccn.loc.gov/{{ .lccn }}"
+
+[main_menu]
+other = "Main menu"
+
+[master_thesis]
+other = "Master's thesis"
+
+[moderation]
+other = "Moderation"
+
+[next_page]
+other = "Next page"
+
+[page_count_string]
+one = "%s&nbsp;page"
+other = "%s&nbsp;pages"
+
+[page_range_string]
+one = "p.&nbsp;%s"
+other = "pp.&nbsp;%s"
+
+[pagination_navigation]
+other = "Pagination navigation"
+
+[phd_thesis]
+other = "Ph.D. thesis"
+
+[posted_on]
+other = "Posted on"
+
+[presented_by]
+other = ", by"
+
+[previous_page]
+other = "Previous page"
+
+[publication_details]
+other = "More"
+
+[read_more]
+other = "Continue reading ..."
+
+[scroll_to_top]
+other = "scroll to top"
+
+[select_language]
+other = "Language"
+
+[show_less]
+other = "Show less"
+
+[show_more]
+other = "Read more ..."
+
+[slides]
+other = "slides"
+
+[table_of_contents]
+other = "Table of Contents"
+
+[technical_report]
+other = "Technical report"
+
+[toggle_navigation]
+other = "Toggle navigation"
+
+[video]
+other = "video"
+
+[vulnerability_report]
+other = "Vulnerability report"
+
+[workshop]
+other = "Workshop"
+
+[Mon]
+other = "{{ with .abbrev }}Mon.{{ else }}Monday{{ end }}"
+
+[Tue]
+other = "{{ with .abbrev }}Tue.{{ else }}Tuesday{{ end }}"
+
+[Wed]
+other = "{{ with .abbrev }}Wed.{{ else }}Wednesday{{ end }}"
+
+[Thu]
+other = "{{ with .abbrev }}Thu.{{ else }}Thursday{{ end }}"
+
+[Fri]
+other = "{{ with .abbrev }}Fri.{{ else }}Friday{{ end }}"
+
+[Sat]
+other = "{{ with .abbrev }}Sat.{{ else }}Saturday{{ end }}"
+
+[Sun]
+other = "{{ with .abbrev }}Sun.{{ else }}Sunday{{ end }}"
+
+[Jan]
+other = "{{ with .abbrev }}Jan.{{ else }}January{{ end }}"
+
+[Feb]
+other = "{{ with .abbrev }}Feb.{{ else }}February{{ end }}"
+
+[Mar]
+other = "{{ with .abbrev }}Mar.{{ else }}March{{ end }}"
+
+[Apr]
+other = "{{ with .abbrev }}Apr.{{ else }}April{{ end }}"
+
+[May]
+other = "May"
+
+[Jun]
+other = "{{ with .abbrev }}Jun.{{ else }}June{{ end }}"
+
+[Jul]
+other = "{{ with .abbrev }}Jul.{{ else }}July{{ end }}"
+
+[Aug]
+other = "{{ with .abbrev }}Aug.{{ else }}August{{ end }}"
+
+[Sep]
+other = "{{ with .abbrev }}Sep.{{ else }}September{{ end }}"
+
+[Oct]
+other = "{{ with .abbrev }}Oct.{{ else }}October{{ end }}"
+
+[Nov]
+other = "{{ with .abbrev }}Nov.{{ else }}November{{ end }}"
+
+[Dec]
+other = "{{ with .abbrev }}Dec.{{ else }}December{{ end }}"

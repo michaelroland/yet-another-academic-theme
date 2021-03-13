@@ -1,0 +1,262 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render the biography of a "people" entry.
+
+Param: Page       The current page context (may be omitted).
+Param: Entry      The page-meta object of the people data entry.
+Param: Settings   Optional dict of local scope (e.g. shortcodes, previews) settings.
+
+Settings:
+    name
+    bio
+    portrait
+    portrait_size
+    portrait_size_small
+    preview_limit
+    vcard
+    vcard_hide_icons
+    vcard_hide_elements
+    no_sociallinks
+    vcard_innerhtml
+    [site.Data.theme.vcard.elements.*.type]
+    [site.Data.theme.vcard.elements.*.type+.secondary]
+
+Page-level Params:
+    biography.portrait_size
+    biography.portrait_size_small
+    biography.preview_limit
+    biography.vcard
+    biography.vcard_hide_icons
+    biography.vcard_hide_elements
+    biography.no_sociallinks
+
+Entry-level Params:
+    portrait
+    title
+    sociallinks
+    [site.Data.theme.vcard.elements.*.type]
+    [site.Data.theme.vcard.elements.*.type+.secondary]
+
+*/ -}}
+{{- $portrait_size := int site.Data.theme.vcard.portrait_size -}}
+{{- $portrait_small_size := int site.Data.theme.vcard.portrait_small_size -}}
+{{- $portrait_small_breakpoint := site.Data.theme.vcard.portrait_small_breakpoint -}}
+{{- $portrait_name := site.Data.theme.vcard.portrait_name -}}
+{{- $as_biography := true -}}
+{{- $preview_pars := 0 -}}
+{{- $as_vcard := false -}}
+{{- $vcard_hide_icons := false -}}
+{{- $vcard_hide_elements := slice -}}
+{{- $no_sociallinks := false -}}
+{{- $vcard_displayname := "" -}}
+{{- with .Page -}}
+    {{- with .Param "biography.portrait_size" -}}
+        {{- $portrait_size = int . -}}
+    {{- end -}}
+    {{- with .Param "biography.portrait_size_small" -}}
+        {{- $portrait_size_small = int . -}}
+    {{- end -}}
+    {{- with .Param "biography.preview_limit" -}}
+        {{- $preview_pars = int . -}}
+    {{- end -}}
+    {{- with .Param "biography.vcard" -}}
+        {{- $as_vcard = . -}}
+    {{- end -}}
+    {{- with .Param "biography.vcard_hide_icons" -}}
+        {{- $vcard_hide_icons = . -}}
+    {{- end -}}
+    {{- with .Param "biography.vcard_hide_elements" -}}
+        {{- $vcard_hide_elements = . -}}
+    {{- end -}}
+    {{- with .Param "biography.no_sociallinks" -}}
+        {{- $no_sociallinks = . -}}
+    {{- end -}}
+{{- end -}}
+{{- with .Settings -}}
+    {{- if isset . "portrait_size" -}}
+        {{- $portrait_size = int .portrait_size -}}
+    {{- end -}}
+    {{- if isset . "portrait_size_small" -}}
+        {{- $portrait_size_small = int .portrait_size_small -}}
+    {{- end -}}
+    {{- if isset . "preview_limit" -}}
+        {{- $preview_pars = int .preview_limit -}}
+    {{- end -}}
+    {{- if isset . "bio" -}}
+        {{- $as_biography = .bio -}}
+    {{- end -}}
+    {{- if isset . "vcard" -}}
+        {{- $as_vcard = .vcard -}}
+    {{- end -}}
+    {{- if isset . "vcard_hide_icons" -}}
+        {{- $vcard_hide_icons = .vcard_hide_icons -}}
+    {{- end -}}
+    {{- if isset . "vcard_hide_elements" -}}
+        {{- $vcard_hide_elements = .vcard_hide_elements -}}
+    {{- end -}}
+    {{- if isset . "name" -}}
+        {{- $vcard_displayname = .name -}}
+    {{- end -}}
+    {{- if isset . "no_sociallinks" -}}
+        {{- $no_sociallinks = .no_sociallinks -}}
+    {{- end -}}
+{{- end -}}
+
+{{- if and $vcard_hide_elements (not (reflect.IsSlice $vcard_hide_elements)) -}}
+    {{- $vcard_hide_elements = slice $vcard_hide_elements -}}
+{{- else if not $vcard_hide_elements -}}
+    {{- $vcard_hide_elements = slice "" -}}
+{{- end -}}
+
+{{- $portrait_img_params := dict "Title" "" "AltText" " " "Width" $portrait_size "Height" $portrait_size "Style" (printf "min-width: %[1]dpx; min-height: %[1]dpx;" $portrait_size) "Class" (printf "mr-3 rounded-circle bg-light d-none d-%s-block" $portrait_small_breakpoint) -}}
+{{- $portrait_small_img_params := dict "Width" $portrait_small_size "Height" $portrait_small_size "Style" (printf "min-width: %[1]dpx; min-height: %[1]dpx;" $portrait_small_size) "Class" (printf "mr-3 rounded-circle bg-light d-block d-%s-none" $portrait_small_breakpoint) -}}
+{{- $portrait_img := false -}}
+{{- $portrait_small_img := false -}}
+{{- with .Entry -}}
+    {{- with .Page.Param "portrait" -}}
+        {{- $portrait_name = . -}}
+    {{- end -}}
+    {{- $portrait_img_params := merge $portrait_img_params (dict "Page" .Page "Destination" $portrait_name) -}}
+    {{- $portrait_img = partial "render-image" $portrait_img_params -}}
+    {{- $portrait_small_img = partial "render-image" (merge $portrait_img_params $portrait_small_img_params) -}}
+    {{- $vcard_displayname = .Page.Title -}}
+{{- end -}}
+{{- with .Settings -}}
+    {{- if isset . "portrait" -}}
+        {{- with .portrait -}}
+            {{- $portrait_img_params := merge $portrait_img_params (dict "Page" $.Page "Destination" .) -}}
+            {{- $portrait_img = partial "render-image" $portrait_img_params -}}
+            {{- $portrait_small_img = partial "render-image" (merge $portrait_img_params $portrait_small_img_params) -}}
+        {{- else -}}
+            {{- $portrait_img = false -}}
+            {{- $portrait_small_img = false -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+{{- if $as_vcard -}}
+<div class="col-12 px-0 media vcard">
+    {{- with $portrait_img -}}
+        {{- . -}}
+    {{- end -}}
+    <div class="media-body">
+    {{- with $portrait_small_img -}}
+        <div class="col-12 p-0 media">
+            {{- . -}}
+            <div class="media-body">
+    {{- end -}}
+                <div class="vcard-name" role="heading" aria-level="6">{{ $vcard_displayname }}</div>
+    {{- range $element := where site.Data.theme.vcard.elements ".type" "not in" $vcard_hide_elements -}}
+        {{- $value := false -}}
+        {{- $value_secondary := false -}}
+        {{- with $.Entry -}}
+            {{- if isset .Params $element.type -}}
+                {{- $value = index .Params $element.type -}}
+                {{- if $element.secondary -}}
+                    {{- $secondary := printf "%s%s" $element.type $element.secondary -}}
+                    {{- if isset .Params $secondary -}}
+                        {{- $value_secondary = index .Params $secondary -}}
+                    {{- end -}}
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}
+        {{- with $.Settings -}}
+            {{- if isset . $element.type -}}
+                {{- $value = index . $element.type -}}
+                {{- if $element.secondary -}}
+                    {{- $secondary := printf "%s%s" $element.type $element.secondary -}}
+                    {{- if isset . $secondary -}}
+                        {{- $value_secondary = index . $secondary -}}
+                    {{- end -}}
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}
+        {{- if $value -}}
+            {{- partial "render-vcard-element" (dict "Page" $.Page "Type" $element.type "HideIcon" $vcard_hide_icons "Value" $value "SecondaryValue" $value_secondary) -}}
+        {{- end -}}
+    {{- end -}}
+    {{- with $.Settings -}}
+        {{- with .vcard_innerhtml -}}
+            {{- . -}}
+        {{- end -}}
+    {{- end -}}
+    {{- if not $no_sociallinks -}}
+        {{- with $.Entry -}}
+            {{- with .Params.sociallinks -}}
+                <ul class="vcard-sociallinks">
+                {{- range . -}}
+                    {{- $has_text_label := true -}}
+                    {{- $label := .url -}}
+                    {{- $title := "" -}}
+                    {{- with .title -}}
+                        {{- $label = . -}}
+                    {{- end -}}
+                    {{- if .icon -}}
+                        {{- $title = $label -}}
+                        {{- with .label -}}
+                            {{- $label = . -}}
+                        {{- else -}}
+                            {{- $label = "" -}}
+                            {{- $has_text_label = false -}}
+                        {{- end -}}
+                        {{- $label = printf "<i class=%q></i>%s" .icon $label -}}
+                    {{- end -}}
+                    <li class="menu-item{{ if .icon }} with-icon{{ end }}{{ if $has_text_label }} with-label{{ end }}">
+                        {{- partial "render-link" (dict "Page" $.Entry.Page "Destination" .url "Title" $title "InnerHTML" $label "Class" "menu-link" "AllowUrlAttrs" true) -}}
+                    </li>
+                {{- end -}}
+                </ul>
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+    {{- with $portrait_small_img -}}
+            </div>
+        </div>
+    {{- end -}}
+{{- end -}}
+{{- with $.Entry -}}
+    {{- with .abstract -}}
+        {{- if not $as_biography -}}
+        {{- else if $preview_pars -}}
+            {{- $id := printf "biography-collapse-%s" $.Entry.uniquekey -}}
+        <div id="{{ $id }}-parent" class="biography">
+            {{- $content_pars := split . "<p>" | after 1 -}}
+            {{- range first $preview_pars $content_pars -}}
+                {{- with . -}}
+                <p>{{ . | safeHTML }}
+                {{- end -}}
+            {{- end -}}
+            {{- if gt (len $content_pars) $preview_pars -}}
+            <div id="{{ $id }}-preview" class="collapse show" data-parent="#{{ $id }}-parent">
+                <p class="biography-preview-button">
+                    <a data-toggle="collapse" href="#{{ $id }}-full" role="button" aria-expanded="false" aria-controls="{{ $id }}-full"><i class="fas fa-plus-circle pr-1"></i>{{ T "show_more" }}</a>
+                </p>
+            </div>
+            <div id="{{ $id }}-full" class="collapse" data-parent="#{{ $id }}-parent">
+                    {{- range after $preview_pars $content_pars -}}
+                <p>{{ . | safeHTML }}
+                    {{- end -}}
+                <p class="biography-preview-button">
+                    <a data-toggle="collapse" href="#{{ $id }}-preview" role="button" aria-expanded="true" aria-controls="{{ $id }}-preview"><i class="fas fa-chevron-circle-up pr-1"></i>{{ T "show_less" }}</a>
+                </p>
+            </div>
+            {{- end -}}
+        </div>
+        {{- else -}}
+        <div class="biography">
+            {{- . | safeHTML -}}
+        </div>
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+{{- if $as_vcard -}}
+    </div>
+</div>
+{{- end -}}

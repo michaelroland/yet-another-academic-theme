@@ -1,0 +1,27 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Function: Convert (string) value to boolean.
+
+Param: Value    The value as string.
+Param: Default  The default boolean value if ".Value" is empty.
+
+Return: The boolean value.
+
+*/ -}}
+{{- $result := .Default | default false -}}
+{{- $value := .Value -}}
+{{- if ne $value "" -}}
+    {{- $value = substr (lower $value) 0 1 -}}
+    {{- if ne $value "" -}}
+        {{- $result = not (in (slice "f" "n" "0") $value) -}}
+    {{- end -}}
+{{- end -}}
+
+{{- return $result -}}

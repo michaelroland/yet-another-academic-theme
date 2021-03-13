@@ -1,0 +1,156 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Default BibTeX renderer.
+
+Context: The current publication data context.
+
+*/ -}}
+{{- $classes := slice -}}
+{{- $classes = $classes | append (dict "type" "misc"            "name" "misc"          "title" "") -}}
+{{- $classes = $classes | append (dict "type" "book"            "name" "book"          "title" "") -}}
+{{- $classes = $classes | append (dict "type" "chapter"         "name" "inbook"        "title" "") -}}
+{{- $classes = $classes | append (dict "type" "conference"      "name" "inproceedings" "title" "") -}}
+{{- $classes = $classes | append (dict "type" "article"         "name" "article"       "title" "") -}}
+{{- $classes = $classes | append (dict "type" "manual"          "name" "manual"        "title" "") -}}
+{{- $classes = $classes | append (dict "type" "manual-game"     "name" "game"          "title" "") -}}
+{{- $classes = $classes | append (dict "type" "manual-software" "name" "software"      "title" "") -}}
+{{- $classes = $classes | append (dict "type" "manual-dataset"  "name" "dataset"       "title" "") -}}
+{{- $classes = $classes | append (dict "type" "online"          "name" "online"        "title" "") -}}
+{{- $classes = $classes | append (dict "type" "periodical"      "name" "periodical"    "title" "") -}}
+{{- $classes = $classes | append (dict "type" "proceedings"     "name" "proceedings"   "title" "") -}}
+{{- $classes = $classes | append (dict "type" "report"          "name" "techreport"    "title" (.pub.Param "report_type" | default "")) -}}
+{{- $classes = $classes | append (dict "type" "report-bug"      "name" "techreport"    "title" (.pub.Param "report_type" | default "Bug report")) -}}
+{{- $classes = $classes | append (dict "type" "report-eval"     "name" "techreport"    "title" (.pub.Param "report_type" | default "Evaluation report")) -}}
+{{- $classes = $classes | append (dict "type" "report-vuln"     "name" "techreport"    "title" (.pub.Param "report_type" | default "Vulnerability report")) -}}
+{{- $classes = $classes | append (dict "type" "thesis"          "name" "phdthesis"     "title" (.pub.Param "thesis_type" | default "")) -}}
+{{- $classes = $classes | append (dict "type" "thesis-"         "name" "thesis"        "title" (.pub.Param "thesis_type" | default "")) -}}
+{{- $classes = $classes | append (dict "type" "thesis-phd"      "name" "phdthesis"     "title" (.pub.Param "thesis_type" | default "")) -}}
+{{- $classes = $classes | append (dict "type" "thesis-master"   "name" "mastersthesis" "title" (.pub.Param "thesis_type" | default "")) -}}
+{{- $classes = $classes | append (dict "type" "thesis-diploma"  "name" "thesis"        "title" (.pub.Param "thesis_type" | default "Diploma thesis")) -}}
+{{- $classes = $classes | append (dict "type" "thesis-bachelor" "name" "thesis"        "title" (.pub.Param "thesis_type" | default "Bachelor thesis")) -}}
+{{- $class := index (index $classes 0) "name"  -}}
+{{- $type  := index (index $classes 0) "title" -}}
+{{- range $classes -}}
+    {{- if hasPrefix $.subtype .type -}}
+        {{- $class = .name -}}
+        {{- $type  = .title -}}
+    {{- end -}}
+{{- end -}}
+@{{ $class }}{{ "{" }}bib:{{ .key }}
+{{- with .title -}}
+    ,
+    title = {{ "{{" }}{{ partial "render-texescape" . }}{{ "}}" }}
+{{- end }}
+{{- if gt .authors.count 0 -}}
+    ,
+    author = {{ "{" }}{{ range first 1 .authors.objects }}{{ .lastname }}{{ with .firstname }}, {{ partial "render-texescape" . }}{{ end }}{{ end }}{{ range after 1 .authors.objects }} and {{ .lastname }}{{ with .firstname }}, {{ partial "render-texescape" . }}{{ end }}{{ end }}{{ "}" }}
+{{- end }}
+{{- if gt .editors.count 0 -}}
+    ,
+    editor = {{ "{" }}{{ range first 1 .editors.objects }}{{ .lastname }}{{ with .firstname }}, {{ partial "render-texescape" . }}{{ end }}{{ end }}{{ range after 1 .editors.objects }} and {{ .lastname }}{{ with .firstname }}, {{ partial "render-texescape" . }}{{ end }}{{ end }}{{ "}" }}
+{{- end }}
+{{- with .organization -}}
+    ,
+    organization = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .booktitle -}}
+    ,
+    booktitle = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .edition -}}
+    ,
+    edition = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .journal -}}
+    ,
+    journal = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .series -}}
+    ,
+    series = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .volume -}}
+    ,
+    volume = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with $type -}}
+    ,
+    type = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .number -}}
+    ,
+    number = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .event.location -}}
+    ,
+    location = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .institution -}}
+    ,
+    institution = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .school -}}
+    ,
+    school = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- if gt .advisors.count 0 -}}
+    ,
+    advisor = {{ "{" }}{{ range first 1 .advisors.objects }}{{ .lastname }}{{ with .firstname }}, {{ partial "render-texescape" . }}{{ end }}{{ end }}{{ range after 1 .advisors.objects }} and {{ .lastname }}{{ with .firstname }}, {{ partial "render-texescape" . }}{{ end }}{{ end }}{{ "}" }}
+{{- end }}
+{{- with .articleno -}}
+    ,
+    articleno = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .pages -}}
+    ,
+    pages = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .numpages -}}
+    ,
+    numpages = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .howpublished -}}
+    ,
+    howpublished = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .publisher -}}
+    ,
+    publisher = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .address -}}
+    ,
+    address = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .doi -}}
+    ,
+    doi = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .issn -}}
+    ,
+    issn = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .isbn -}}
+    ,
+    isbn = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .lccn -}}
+    ,
+    lccn = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{- with .thedate.date -}}
+    ,
+    year = {{ "{" }}{{ dateFormat "2006" . }}{{ "}" }},
+    month = {{ dateFormat "Jan" . | upper }}
+{{- end }}
+{{- with .note -}}
+    ,
+    note = {{ "{" }}{{ partial "render-texescape" . }}{{ "}" }}
+{{- end }}
+{{ "}" }}

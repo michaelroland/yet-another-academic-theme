@@ -1,0 +1,53 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Function: Assemble sidebar widgets structure for a page context.
+
+Param: Page      The page that sidebar widgets should be assembled for.
+Param: Params    Dict of content/page parameters (usually, but not necessarily,
+           equivalent to "Page.Params").
+
+Return: A sidebar widgets structure that consists of
+    .sidebar_widgets    List of sidebar widget page objects.
+    .sidebar_show       True if sidebar is visible on the current page.
+    .toc_show           True if table of contents is visible on the current page.
+    .toc_heading_show   True if table of contents heading is visible on the current page.
+
+*/ -}}
+{{- $sidebar_show := .Page.Param "sidebar" -}}
+{{- $sidebar_widgets := slice -}}
+{{- if $sidebar_show -}}
+    {{- $page_url := replace .Page.Permalink .Page.Site.Home.Permalink "" -}}
+    {{- $page_url = trim $page_url "/" -}}
+    {{- $sidebar_bundle_current_lang := site.GetPage (printf "/%s" site.Data.theme.config.sidebar_widgets_bundle) -}}
+    {{- $sidebar_bundle_default_lang := site.Sites.First.GetPage (printf "/%s" site.Data.theme.config.sidebar_widgets_bundle) -}}
+    {{- $sidebar_bundle := $sidebar_bundle_current_lang.Pages | lang.Merge $sidebar_bundle_default_lang.Pages -}}
+    {{- range $sidebar := where $sidebar_bundle "Params.hidden" "!=" true -}}
+        {{- if not (in $sidebar.Params.hideOn $page_url) -}}
+            {{- $sidebar_widgets = $sidebar_widgets | append $sidebar -}}
+        {{- end -}}
+    {{- end -}}
+    {{- if not (len $sidebar_widgets) -}}
+        {{- $sidebar_show = false -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $toc_show := .Page.Param "toc" -}}
+{{- $toc_heading_show := .Page.Param "toc_heading" -}}
+{{- if $toc_show -}}
+    {{- if plainify .Page.TableOfContents -}}
+        {{- $sidebar_show = true -}}
+    {{- else -}}
+        {{- $toc_show = false -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $result := dict "sidebar_widgets" $sidebar_widgets "sidebar_show" $sidebar_show -}}
+{{- $result = merge $result (dict "toc_show" $toc_show "toc_heading_show" $toc_heading_show) -}}
+{{- return $result -}}

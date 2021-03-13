@@ -1,0 +1,63 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Shortcode: Print a V-Card element.
+
+Note: This shortcode expects an ".Inner" body and, therefore, needs to be closed.
+
+Note: This shortcode is not limited to use within vcard and biography shortcodes.
+
+Param 0: type           The V-Card element type (see site.Data.theme.vcard.elements for
+           valid types) or an icon class definition.
+Param: icon             Optional icon class definition to override the default icon of
+           the element type.
+Param: value            Optional display value for the V-Card element (only used if
+           ".Inner" is empty).
+Param: text             Alternate name for the "value" attribute (available for
+           interoperability).
+Param: secondary_value  Optional secondary display value for the V-Card element.
+Inner: Display value for the V-Card element (defaults to "value" if empty).
+
+*/ -}}
+{{- $type := "" -}}
+{{- $icon := "" -}}
+{{- $value := "" -}}
+{{- $secondary_value := "" -}}
+{{- with .Get (cond .IsNamedParams "type" 0) -}}
+    {{- $elements := where site.Data.theme.vcard.elements "type" . -}}
+    {{- if $elements -}}
+        {{- $element = index $elements 0 -}}
+        {{- $type = $element.type -}}
+    {{- else -}}
+        {{- $icon = . -}}
+    {{- end -}}
+{{- end -}}
+{{- if .IsNamedParams -}}
+    {{- with .Get "icon" -}}
+        {{- $icon = . -}}
+    {{- end -}}
+    {{- with .Get "text" -}}
+        {{- $value = . -}}
+    {{- end -}}
+    {{- with .Get "secondary_value" -}}
+        {{- $secondary_value = . -}}
+    {{- end -}}
+{{- end -}}
+
+{{- with .Inner -}}
+    {{- $value = . -}}
+{{- else -}}
+    {{- with .Get (cond .IsNamedParams "value" 1) -}}
+        {{- $value = . -}}
+    {{- end -}}
+{{- end -}}
+
+{{- if $value -}}
+    {{- partial "render-vcard-element" (dict "Page" .Page "Type" $type "Icon" $icon "Value" $value "SecondaryValue" $secondary_value) -}}
+{{- end -}}

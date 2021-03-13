@@ -1,0 +1,215 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Function: Assemble page/content metadata.
+
+Param: Page      The page that content metadata should be assembled for.
+Param: Params    Dict of content/page parameters (usually, but not necessarily,
+           equivalent to "Page.Params").
+Param: Settings  Optional dict of local scope (e.g. shortcodes, previews) settings
+           (may contain "display_authors", "display_date").
+
+Return: A content metadata structure that consists of
+    .Page               The input Page object.
+    .Params             The input Params object.
+    .authors            
+    .author_links       
+    .date               
+    .moddate            
+    .display_authors    
+    .display_date       
+    .key                
+    .uniquekey          
+    .abstract           
+    .features           
+    .main               
+    .supplementary      
+    .is_regular_page    
+    .is_referal_page    
+    .is_special_bundle  
+    .permalink          
+    .preview_icon       
+
+*/ -}}
+{{- $authors := dict -}}
+{{- with .Params -}}
+    {{- $authors = partial "function-process-authors" (dict "Authors" .author) -}}
+{{- end -}}
+
+{{- $author_links := false -}}
+{{- with .Page -}}
+    {{- $author_links = .Param "author_links" | default $author_links -}}
+{{- end -}}
+{{- with .Settings -}}
+    {{- if isset . "author_links" -}}
+        {{- $author_links = .author_links -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $date_str := now -}}
+{{- $moddate_str := $date_str -}}
+{{- with .Page -}}
+    {{- $date_str = .Date -}}
+    {{- $moddate_str = .Lastmod -}}
+{{- end -}}
+{{- with .Params -}}
+    {{- with .date -}}
+        {{- $date_str = . -}}
+    {{- end -}}
+    {{- with .lastmod -}}
+        {{- $moddate_str = . -}}
+    {{- end -}}
+{{- end -}}
+{{- $date := partial "function-process-date" (dict "Date" $date_str) -}}
+{{- $moddate := partial "function-process-date" (dict "Date" $moddate_str) -}}
+
+{{- $display_authors := false -}}
+{{- $display_date := false -}}
+{{- with .Page -}}
+    {{- with .Parent -}}
+        {{- $display_authors = .Param "posts.display_authors" | default $display_authors -}}
+        {{- $display_date = .Param "posts.display_date" | default $display_date -}}
+    {{- end -}}
+{{- end -}}
+{{- with .Settings -}}
+    {{- if isset . "display_authors" -}}
+        {{- $display_authors = .display_authors -}}
+    {{- end -}}
+    {{- if isset . "display_date" -}}
+        {{- $display_date = .display_date -}}
+    {{- end -}}
+{{- end -}}
+{{- with .Params -}}
+    {{- if isset . "display_authors" -}}
+        {{- $display_authors = .display_authors -}}
+    {{- end -}}
+    {{- if isset . "display_date" -}}
+        {{- $display_date = .display_date -}}
+    {{- end -}}
+{{- end -}}
+
+
+{{- $key := "" -}}
+{{- $uniquekey := "" -}}
+{{- $is_regular_page := false -}}
+{{- $is_special_bundle := false -}}
+{{- with .Page -}}
+    {{- with .File -}}
+        {{- $key = .ContentBaseName -}}
+        {{- $uniquekey = .UniqueID -}}
+    {{- end -}}
+    {{- with .Type -}}
+        {{- $is_special_bundle = in site.Data.theme.config.special_page_types . -}}
+        {{- $is_regular_page = not $is_special_bundle -}}
+    {{- end -}}
+    {{- with .Kind -}}
+        {{- $is_regular_page = $is_regular_page | or (eq . "section") -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $abstract := "" -}}
+{{- $features := slice -}}
+{{- $main_content := slice -}}
+{{- $supplementary_content := slice -}}
+{{- with .Page -}}
+    {{- $content_parts := split .Content "<h1 " -}}{{- /* "> */ -}}
+    {{- $abstract = delimit ($content_parts | first 1) "" | chomp -}}
+
+    {{- $features_count := 0 -}}
+    {{- $features_config := slice -}}
+    {{- with $.Params -}}
+        {{- $features_config = .featured -}}
+    {{- end -}}
+    {{- with .Param "featured" -}}
+        {{- $features_config = . -}}
+    {{- end -}}
+    {{- if reflect.IsSlice $features_config -}}
+        {{- $features_count = len $features_config -}}
+    {{- else if $features_config -}}
+        {{- $features_count = int $features_config -}}
+    {{- end -}}
+    
+    {{- $supplementary_offset := sub (len $content_parts) 1 -}}
+    {{- $supplementary_config := slice -}}
+    {{- with $.Params -}}
+        {{- $supplementary_config = .supplementary -}}
+    {{- end -}}
+    {{- with .Param "supplementary" -}}
+        {{- $supplementary_config = . -}}
+    {{- end -}}
+    {{- if reflect.IsSlice $supplementary_config -}}
+        {{- $supplementary_offset = sub $supplementary_offset (len $supplementary_config) -}}
+    {{- else if $supplementary_config -}}
+        {{- $supplementary_offset = sub $supplementary_offset (int $supplementary_config) -}}
+    {{- end -}}
+    
+    {{- range $index, $content := $content_parts | after 1 -}}
+        {{- $section_key := printf "%d" $index -}}
+        {{- $split_content := split $content "</h1>" -}}
+        {{- $heading := printf "<h1 %s</h1>" (delimit ($split_content | first 1) "") | chomp -}}
+        {{- if eq (plainify $heading) "" -}}
+            {{- $heading = "" -}}
+        {{- end -}}
+        {{- $content := delimit ($split_content | after 1) "</h1>" | chomp -}}
+        {{- $section := dict "key" $section_key "heading" $heading "content" $content -}}
+        
+        {{- if lt $index $features_count -}}
+            {{- $feature := index $features_config $index -}}
+            {{- range $image_type := slice "image" "background_image" -}}
+                {{- with index $feature $image_type -}}
+                    {{- $image_url := . | relURL -}}
+                    {{- with $.Page.Resources.GetMatch . -}}
+                        {{- $image_url = .RelPermalink -}}
+                    {{- end -}}
+                    {{- $feature = merge $feature (dict $image_type $image_url) -}}
+                {{- end -}}
+            {{- end -}}
+            {{- $feature = merge $feature $section -}}
+            {{- $features = $features | append $feature -}}
+        {{- else if lt $index $supplementary_offset -}}
+            {{- $main_content = $main_content | append $section -}}
+        {{- else -}}
+            {{- $supplementary_content = $supplementary_content | append $section -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $is_referal_page := false -}}
+{{- $permalink := "" -}}
+{{- $preview_icon := "" -}}
+{{- with .Page -}}
+    {{- $permalink = .RelPermalink -}}
+{{- end -}}
+{{- with .Params -}}
+    {{- with .target -}}
+        {{- $permalink = . -}}
+        {{- $is_referal_page = true -}}
+    {{- end -}}
+    {{- with .preview_icon -}}
+        {{- $preview_icon = . -}}
+        {{- $preview_icon_url := . | relURL -}}
+        {{- with $.Page -}}
+            {{- with .Resources.GetMatch $preview_icon -}}
+                {{- $preview_icon_url = .RelPermalink -}}
+            {{- end -}}
+        {{- end -}}
+        {{- $preview_icon = $preview_icon_url -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $result := dict "Page" .Page "Params" .Params -}}
+{{- $result = merge $result (dict "authors" $authors "author_links" $author_links) -}}
+{{- $result = merge $result (dict "date" $date "moddate" $moddate) -}}
+{{- $result = merge $result (dict "display_authors" $display_authors "display_date" $display_date) -}}
+{{- $result = merge $result (dict "key" $key "uniquekey" $uniquekey) -}}
+{{- $result = merge $result (dict "abstract" $abstract "features" $features "main" $main_content "supplementary" $supplementary_content) -}}
+{{- $result = merge $result (dict "is_regular_page" $is_regular_page "is_referal_page" $is_referal_page "is_special_bundle" $is_special_bundle) -}}
+{{- $result = merge $result (dict "permalink" $permalink) -}}
+{{- $result = merge $result (dict "preview_icon" $preview_icon) -}}
+{{- return $result -}}

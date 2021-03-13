@@ -1,0 +1,45 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render featured content sections.
+
+Context: The current content meta context of a page.
+
+*/ -}}
+{{- range .features -}}
+<article id="featured-content-{{ .key }}" class="featured{{ if .background_image }} featured-background{{ end }} featured-{{ if .background_invert }}invert{{ else }}normal{{ end }}" style="{{ with .background_image }}background-image: url('{{ . | safeURL }}');{{ end }}">
+    <div class="container container-fluid-lg mb-0">
+        <div class="row justify-content-center">
+        {{- with .heading -}}
+            <div class="col-12 mb-0">
+            {{- . | safeHTML -}}
+            </div>
+        {{- end -}}
+        {{- if not .image_left -}}
+            <div class="col-12 {{ if and (not .image_fullwidth) .image }}col-sm-8 col-md-9{{ end }} mb-0">
+            {{- .content | safeHTML -}}
+            </div>
+        {{- end -}}
+        {{- if .image -}}
+            <div class="{{ if .image_fullwidth }}col-12 mt-3{{ else }}col-5 col-sm-4 col-md-3 mt-3 mt-sm-0{{ end }} mb-0 text-center">
+                <img src="{{ .image | safeURL }}" alt="{{ with .image_alt }}{{ . }}{{ else }} {{ end }}" title="{{ with .image_title }}{{ . }}{{ end }}" class="featured-image{{ if .image_rounded }} rounded{{ else if .image_circle }} rounded-circle{{ end }}"
+                    {{- with .image_width }} width="{{ . }}"{{ end -}}
+                    {{- with .image_height }} height="{{ . }}"{{ end -}}
+                >
+            </div>
+        {{- end -}}
+        {{- if .image_left -}}
+            <div class="col-12 {{ if and (not .image_fullwidth) .image }}col-sm-8 col-md-9{{ end }} mb-0">
+            {{- .content | safeHTML -}}
+            </div>
+        {{- end -}}
+        </div>
+    </div>
+</article>
+{{- end -}}

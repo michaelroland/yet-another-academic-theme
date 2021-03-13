@@ -1,0 +1,62 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Function: Process date/timestamp range into a date range structure.
+
+Note: Timezones are currently ignored!
+
+Param: DateStart  The begin date structure.
+Param: DateEnd    The end date structure.
+
+Return: A date structure (as defined in function-process-date.html) for "DateStart"
+    merged with the differing components of a date structure for "DateEnd" suffixed
+    with "2" (so if years differ, the resulting structure contains, e.g., "yy" and
+    "yy2").
+
+*/ -}}
+{{- $date_range := .DateStart -}}
+{{- $merge_fields := slice -}}
+{{- if ne $date_range.date .DateEnd.date -}}
+    {{- $merge_fields = $merge_fields | append (slice "date") -}}
+{{- end -}}
+{{- if ne $date_range.yyyy .DateEnd.yyyy -}}
+    {{- $merge_fields = $merge_fields | append (slice "yy" "yyyy") -}}
+    {{- $merge_fields = $merge_fields | append (slice "m" "mm" "mmm" "mmmm") -}}
+    {{- $merge_fields = $merge_fields | append (slice "d" "dd" "ddd" "dddd") -}}
+    {{- $merge_fields = $merge_fields | append (slice "h" "hh" "H" "HH" "ampm") -}}
+    {{- $merge_fields = $merge_fields | append (slice "n" "nn") -}}
+    {{- $merge_fields = $merge_fields | append (slice "s" "ss") -}}
+{{- else if ne $date_range.m .DateEnd.m -}}
+    {{- $merge_fields = $merge_fields | append (slice "m" "mm" "mmm" "mmmm") -}}
+    {{- $merge_fields = $merge_fields | append (slice "d" "dd" "ddd" "dddd") -}}
+    {{- $merge_fields = $merge_fields | append (slice "h" "hh" "H" "HH" "ampm") -}}
+    {{- $merge_fields = $merge_fields | append (slice "n" "nn") -}}
+    {{- $merge_fields = $merge_fields | append (slice "s" "ss") -}}
+{{- else if ne $date_range.d .DateEnd.d -}}
+    {{- $merge_fields = $merge_fields | append (slice "d" "dd" "ddd" "dddd") -}}
+    {{- $merge_fields = $merge_fields | append (slice "h" "hh" "H" "HH" "ampm") -}}
+    {{- $merge_fields = $merge_fields | append (slice "n" "nn") -}}
+    {{- $merge_fields = $merge_fields | append (slice "s" "ss") -}}
+{{- else if ne $date_range.H .DateEnd.H -}}
+    {{- $merge_fields = $merge_fields | append (slice "h" "hh" "H" "HH" "ampm") -}}
+    {{- $merge_fields = $merge_fields | append (slice "n" "nn") -}}
+    {{- $merge_fields = $merge_fields | append (slice "s" "ss") -}}
+{{- else if ne $date_range.n .DateEnd.n -}}
+    {{- $merge_fields = $merge_fields | append (slice "n" "nn") -}}
+    {{- $merge_fields = $merge_fields | append (slice "s" "ss") -}}
+{{- else if ne $date_range.s .DateEnd.s -}}
+    {{- $merge_fields = $merge_fields | append (slice "s" "ss") -}}
+{{- end -}}
+{{- range $merge_fields -}}
+    {{- $field_end := printf "%s2" . -}}
+    {{- $value := index $.DateEnd . -}}
+    {{- $date_range = merge $date_range (dict $field_end $value) -}}
+{{- end -}}
+
+{{- return $date_range -}}

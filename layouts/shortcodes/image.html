@@ -1,0 +1,58 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Shortcode: Print an image.
+
+Param 0: src          The image URL or page resource name.
+Param 1: alt          Optional alternate text attribute (defaults to an empty string or the resource title).
+Param 2: title        Optional title attribute (defaults to an empty string or the resource title).
+Param 3: width        Optional image width attribute.
+Param 4: height       Optional image height attribute.
+Param 5: float        Optional float-style class attribute (e.g. "left" for "float-left").
+Param: class          Optional class attribute for the image.
+Param: style          Optional style attribute for the image.
+
+*/ -}}
+{{- $url := "" -}}
+{{- $alt := "" -}}
+{{- $title := "" -}}
+{{- $width := 0 -}}
+{{- $height := 0 -}}
+{{- $float := "" -}}
+{{- $class := "" -}}
+{{- $style := "" -}}
+
+{{- with .Get (cond .IsNamedParams "src" 0) -}}
+    {{- $url = . -}}
+{{- end -}}
+{{- with .Get (cond .IsNamedParams "alt" 1) -}}
+    {{- $alt = . -}}
+{{- end -}}
+{{- with .Get (cond .IsNamedParams "title" 2) -}}
+    {{- $title = . -}}
+{{- end -}}
+{{- with .Get (cond .IsNamedParams "width" 3) -}}
+    {{- $width = . -}}
+{{- end -}}
+{{- with .Get (cond .IsNamedParams "height" 4) -}}
+    {{- $height = . -}}
+{{- end -}}
+{{- with .Get (cond .IsNamedParams "float" 5) -}}
+    {{- $float = . -}}
+{{- end -}}
+{{- if .IsNamedParams  -}}
+    {{- with .Get "class" -}}
+        {{- $class = . -}}
+    {{- end -}}
+    {{- with .Get "style" -}}
+        {{- $style = . -}}
+    {{- end -}}
+{{- end -}}
+
+{{- partial "render-image" (dict "Page" .Page "Destination" $url "Title" $title "AltText" $alt "Width" $width "Height" $height "Float" $float "Class" $class "Style" $style) -}}

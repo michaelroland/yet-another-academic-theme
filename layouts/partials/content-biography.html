@@ -1,0 +1,18 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render biography content section.
+
+Context: The current content meta context of a page.
+
+*/ -}}
+<article id="biography-content" class="biography-content">
+{{- $settings := merge (dict "bio" true "vcard" true) .Params -}}
+{{- partial "biography" (dict "Page" .Page "Entry" . "Settings" $settings) -}}
+</article>

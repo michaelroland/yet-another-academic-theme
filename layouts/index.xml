@@ -1,0 +1,56 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+
+{{- $limit := site.Config.Services.RSS.Limit -}}
+{{- if .IsHome -}}
+  {{- printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  {{- $pages := where .Site.Pages ".Params.hidden" "!=" true -}}
+  {{- $pages = union (where $pages ".Type" "not in" site.Data.theme.config.special_page_types) (where $pages ".Kind" "section") -}}
+  {{- $pages = sort $pages "Title" "asc" -}}
+  {{- $pages = sort $pages "Params.date" "desc" -}}
+  {{- if ge $limit 1 -}}
+    {{- $pages = $pages | first $limit -}}
+  {{- end }}
+  <channel>
+    <title>{{ .Site.Title }}</title>
+    <link>{{ .Permalink }}</link>
+    <description>Recent content on {{ .Site.Title }}</description>
+  {{- with .Site.LanguageCode }}
+    <language>{{ . }}</language>
+  {{- end }}
+  {{- with .Site.Copyright }}
+    <copyright>{{ T "copyright" }} {{ now.Format "2006" }} {{ . }}</copyright>
+  {{- end }}
+  {{- if not .Site.LastChange.IsZero }}
+    <lastBuildDate>{{ .Site.LastChange.Format "Mon, 02 Jan 2006 15:04:05 -0700" | safeHTML }}</lastBuildDate>
+  {{- else if not (index .Sites 0).LastChange.IsZero }}
+    <lastBuildDate>{{ (index .Sites 0).LastChange.Format "Mon, 02 Jan 2006 15:04:05 -0700" | safeHTML }}</lastBuildDate>
+  {{- end }}
+  {{- with .OutputFormats.Get "RSS" }}
+    {{ printf "<atom:link href=%q rel=\"self\" type=%q />" .Permalink .MediaType | safeHTML }}
+  {{- end }}
+  {{- range $pages }}
+    {{- $pagedata := partial "function-content-meta" (dict "Page" . "Params" .Params) -}}
+    {{- if and $pagedata.is_regular_page (not $pagedata.is_referal_page) }}
+    <item>
+      <title>{{ .Title }}</title>
+      <link>{{ .Permalink }}</link>
+      <guid isPermaLink="true">{{ .Permalink }}</guid>
+      {{- with $pagedata.date.date }}
+      <pubDate>{{ dateFormat "Mon, 02 Jan 2006 15:04:05 -0700" . | safeHTML }}</pubDate>
+      {{- end -}}
+      {{- with $pagedata.abstract }}
+      <description>{{ . }}</description>
+      {{- end }}
+    </item>
+    {{- end }}
+  {{- end }}
+  </channel>
+</rss>
+{{- end -}}

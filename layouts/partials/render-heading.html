@@ -1,0 +1,74 @@
+{{- /*
+******  Copyright (c) 2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render a link as an HTML <a> element.
+
+Param: Page          The current page context (may be omitted).
+Param: Level         The header level (must be in the range 1..6, or 0 to auto-assign
+           the next level).
+Param: Anchor        A locally unique ID for the header within the page.
+Param: InnerHTML     Inner HTML for the <h...> element.
+Param: Class         Optional class attribute for the <h...> element.
+Param: Style         Optional style attribute for the <h...> element.
+Param: OtherAttrs    Optional custom additional attributes for the <h...> element.
+Param: NoAnchorLink  Optional, if true, hide anchor link.
+
+Introduces the following page-level scratch variables:
+    last_auto_anchor       The numeric value of the last automatically generated heading anchor ID.
+    current_heading_level  The heading level of the current paragraph/section.
+    current_heading_id     The heading anchor ID of the current paragraph/section.
+
+*/ -}}
+{{- $level := int .Level -}}
+{{- $anchor := .Anchor -}}
+{{- $anchor_link := not .NoAnchorLink -}}
+{{- $class := .Class -}}
+{{- $style := .Style -}}
+{{- with $.Page -}}
+    {{- /* Note:
+           Shortcodes are executed before (or in parallel?) to content markdown rendering.
+           Hence, current_heading_level and current_heading_id from markdown headings are
+           not accessible from shortcodes.
+    */ -}}
+    {{- if lt $level 1 -}}
+        {{- $level = .Scratch.Get "current_heading_level" | default 1 | add 1 | add $level -}}
+    {{- end -}}
+    {{- if not $anchor -}}
+        {{- .Scratch.Add "last_auto_anchor" 1 -}}
+        {{- $anchor = print site.Data.theme.heading.autoanchor_prefix (.Scratch.Get "last_auto_anchor") -}}
+    {{- end -}}
+    {{- .Scratch.Set "current_heading_level" $level -}}
+    {{- .Scratch.Set "current_heading_id" $anchor -}}
+    
+    {{- $anchor_link = and $anchor_link (.Param "heading_anchor_link") -}}
+    {{- with .Param "heading_anchor_link_start_level" -}}
+        {{- if lt $level . -}}
+            {{- $anchor_link = false -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+{{- if lt $level 1 -}}
+    {{- $level = 1 -}}
+{{- end -}}
+{{- if gt $level 6 -}}
+    {{- errorf "Heading level %d out of allowed range (1..6)" $level -}}
+{{- end -}}
+<h{{ $level }}
+   {{- with $anchor }} id="{{ . | safeURL }}"{{ end -}}
+   {{- with $class }} class="{{ . }}"{{ end -}}
+   {{- with $style }} style="{{ . | safeCSS }}"{{ end -}}
+   {{- with .OtherAttrs }} {{ . | safeHTMLAttr }}{{ end -}}
+>
+{{- with .InnerHTML -}}
+    {{- . | safeHTML -}}
+    {{- if $anchor_link -}}
+    <a class="heading-anchor" {{- with $anchor }} href="#{{ . | safeURL }}"{{ end -}}><span class="heading-anchor-icon"></span></a>
+    {{- end -}}
+{{- end -}}
+</h{{ $level }}>

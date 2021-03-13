@@ -1,0 +1,92 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Function: Process author lists into structure.
+
+Param: Authors  List of authors or single author name as string.
+
+Return: An author structure that consists of
+    .count           Number of authors.
+    .objects         List of author objects (dict consisting of "lastname",
+        "firstname", "firstinitials", "fullname", "abbrevname", "page").
+    .delimiter       Delimiter to use when stringifying author list.
+    .delimiter_last  Final delimiter to use when stringifying author list.
+
+*/ -}}
+{{- $people_bundle_current_lang := site.GetPage (printf "/%s" site.Data.theme.config.people_bundle) -}}
+{{- $people_bundle_default_lang := site.Sites.First.GetPage (printf "/%s" site.Data.theme.config.people_bundle) -}}
+{{- $people := $people_bundle_current_lang.Pages | lang.Merge $people_bundle_default_lang.Pages -}}
+{{- $people := where $people "Params.hidden" "!=" true -}}
+
+{{- $author_list := .Authors -}}
+{{- if and $author_list (not (reflect.IsSlice $author_list)) -}}
+    {{- $author_list = slice $author_list -}}
+{{- else if not $author_list -}}
+    {{- $author_list = slice -}}
+{{- end -}}
+{{- $authors := slice -}}
+{{- range $author_list -}}
+    {{- $authorpage := index (where $people "Params.name" .) 0 -}}
+    {{- $fullname := split . "," -}}
+    {{- $lastname := trim (index $fullname 0) " \t\r\n" -}}
+    {{- $firstname := trim (index $fullname 1) " \t\r\n" -}}
+    {{- with $authorpage -}}
+        {{- with .Params -}}
+            {{- if isset . "lastname" -}}
+                {{- $lastname = .lastname -}}
+            {{- end -}}
+            {{- if isset . "firstname" -}}
+                {{- $firstname = .firstname -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+    {{- $initials := slice -}}
+    {{- range split $firstname " " -}}
+        {{- if in . "-" -}}
+            {{- $namepart := slice -}}
+            {{- range split . "-" -}}
+                {{- $namepart = $namepart | append (printf "%s." (substr . 0 1)) -}}
+            {{- end -}}
+            {{- $initials = $initials | append (delimit $namepart "-") -}}
+        {{- else -}}
+            {{- $initials = $initials | append (printf "%s." (substr . 0 1)) -}}
+        {{- end -}}
+    {{- end -}}
+    {{- $firstinitials := delimit $initials " " -}}
+    {{- with $authorpage -}}
+        {{- with .Params -}}
+            {{- if isset . "firstinitials" -}}
+                {{- $firstinitials = .firstinitials -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+    {{- $author := dict "lastname" $lastname "firstname" $firstname "firstinitials" $firstinitials -}}
+    {{- $fullname_str := T "fullname" $author -}}
+    {{- $abbrevname_str := T "abbrevname" $author -}}
+    {{- with $authorpage -}}
+        {{- with .Params -}}
+            {{- if isset . "fullname" -}}
+                {{- $fullname_str = .fullname -}}
+            {{- end -}}
+            {{- if isset . "abbrevname" -}}
+                {{- $abbrevname_str = .abbrevname -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+    {{- $author = merge $author (dict "fullname" $fullname_str "abbrevname" $abbrevname_str) -}}
+    {{- $author = merge $author (dict "page" $authorpage) -}}
+    {{- $authors = $authors | append $author -}}
+{{- end -}}
+{{- $two := eq 2 (len $authors) -}}
+{{- $name_delimiter := T "fullnames_delimiter" (dict "two" $two "last" false) -}}
+{{- $name_delimiter_last := T "fullnames_delimiter" (dict "two" $two "last" true) -}}
+
+{{- $result := dict "count" (len $authors) "objects" $authors -}}
+{{- $result := merge $result (dict "delimiter" $name_delimiter "delimiter_last" $name_delimiter_last) -}}
+{{- return $result -}}

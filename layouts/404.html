@@ -1,0 +1,16 @@
+{{ define "title" }}
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- T "error_404_title" }} &ndash; {{ .Site.Title -}}
+{{ end }}
+
+{{ define "header" }}{{ partial "header" . }}{{ end }}
+
+{{ define "main" }}{{ partial "main-404" . }}{{ end }}
+
+{{ define "footer" }}{{ partial "footer" . }}{{ end }}
