@@ -26,6 +26,7 @@ Return: A content metadata structure that consists of
     .display_date       
     .key                
     .uniquekey          
+    .has_content        
     .abstract           
     .features           
     .main               
@@ -208,6 +209,7 @@ Return: A content metadata structure that consists of
 {{- $result = merge $result (dict "date" $date "moddate" $moddate) -}}
 {{- $result = merge $result (dict "display_authors" $display_authors "display_date" $display_date) -}}
 {{- $result = merge $result (dict "key" $key "uniquekey" $uniquekey) -}}
+{{- $result = merge $result (dict "has_content" (or (gt (len $abstract) 0) (gt (len $features) 0) (gt (len $main_content) 0) (gt (len $supplementary_content) 0))) -}}
 {{- $result = merge $result (dict "abstract" $abstract "features" $features "main" $main_content "supplementary" $supplementary_content) -}}
 {{- $result = merge $result (dict "is_regular_page" $is_regular_page "is_referal_page" $is_referal_page "is_special_bundle" $is_special_bundle) -}}
 {{- $result = merge $result (dict "permalink" $permalink) -}}

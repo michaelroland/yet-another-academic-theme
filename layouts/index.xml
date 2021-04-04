@@ -37,7 +37,7 @@
   {{- end }}
   {{- range $pages }}
     {{- $pagedata := partial "function-content-meta" (dict "Page" . "Params" .Params) -}}
-    {{- if and $pagedata.is_regular_page (not $pagedata.is_referal_page) }}
+    {{- if and $pagedata.is_regular_page (not $pagedata.is_referal_page) $pagedata.has_content }}
     <item>
       <title>{{ .Title }}</title>
       <link>{{ .Permalink }}</link>
@@ -46,7 +46,7 @@
       <pubDate>{{ dateFormat "Mon, 02 Jan 2006 15:04:05 -0700" . | safeHTML }}</pubDate>
       {{- end -}}
       {{- with $pagedata.abstract }}
-      <description>{{ . }}</description>
+      <description>{{ . | html }}</description>
       {{- end }}
     </item>
     {{- end }}
