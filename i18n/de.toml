@@ -180,6 +180,9 @@ other = "Details"
 [read_more]
 other = "Weiterlesen ..."
 
+[recent_content_on]
+other = "Neue Inhalte auf %s"
+
 [scroll_to_top]
 other = "zum Seitenanfang"
 

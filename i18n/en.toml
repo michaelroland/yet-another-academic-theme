@@ -180,6 +180,9 @@ other = "More"
 [read_more]
 other = "Continue reading ..."
 
+[recent_content_on]
+other = "Recent content on %s"
+
 [scroll_to_top]
 other = "scroll to top"
 
