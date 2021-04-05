@@ -9,5 +9,33 @@
 
 Shortcode: Print the table of contents.
 
+Param: inline  Make table of contents an inline list (defaults to false).
+Param: prefix  Optional prefix for inline display.
+Param: suffix  Optional suffix for inline display.
+Param: class   Optional class attribute for table of contents.
+Param: style   Optional style attribute for table of contents.
+
 */ -}}
-{{- $.Page.TableOfContents -}}
+{{- $inline := false -}}
+{{- $class := "" -}}
+{{- $style := "" -}}
+
+{{- if .IsNamedParams -}}
+    {{- with .Get "inline" -}}
+        {{- $inline = . -}}
+    {{- end -}}
+    {{- with .Get "class" -}}
+        {{- $class = . -}}
+    {{- end -}}
+    {{- with .Get "style" -}}
+        {{- $style = . -}}
+    {{- end -}}
+{{- end -}}
+
+<div class="toc{{ with $inline }} toc-inline{{ end }}{{ with $class }} {{ . }}{{ end }}"
+    {{- with $style }} style="{{ . }}"{{ end -}}
+>
+    {{- if $inline -}}{{- with .Get "prefix" -}}{{- . | markdownify -}}{{- end -}}{{- end -}}
+    {{- $.Page.TableOfContents -}}
+    {{- if $inline -}}{{- with .Get "suffix" -}}{{- . | markdownify -}}{{- end -}}{{- end -}}
+</div>

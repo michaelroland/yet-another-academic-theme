@@ -1487,3 +1487,56 @@ a.heading-anchor:hover, a.heading-anchor:focus, a.heading-anchor:focus-within {
 *[id]:hover > .heading-anchor {
     visibility: visible;
 }
+
+.toc.toc-inline nav {
+    display: inline;
+}
+
+.toc.toc-inline ul,
+#main .toc.toc-inline ul {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    xfont-size: 0.8em;
+}
+
+.toc.toc-inline ul ul,
+#main .toc.toc-inline ul ul {
+    font-size: 0.8em;
+}
+
+.toc.toc-inline ul ul:before,
+#main .toc.toc-inline ul ul:before {
+    content: '(';
+}
+
+.toc.toc-inline ul ul:after,
+#main .toc.toc-inline ul ul:after {
+    content: ')';
+}
+
+.toc.toc-inline ul ul ul,
+#main .toc.toc-inline ul ul ul {
+    display: none;
+}
+
+.toc.toc-inline li,
+#main .toc.toc-inline li,
+.toc.toc-inline li li,
+#main .toc.toc-inline li li {
+    display: inline;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.toc.toc-inline li:after,
+#main .toc.toc-inline li:after {
+    content: ' / ';
+}
+
+.toc.toc-inline li:last-child:after,
+#main .toc.toc-inline li:last-child:after {
+    margin-left: 0;
+    content: '';
+}
