@@ -19,9 +19,11 @@ Context: The current page context.
             <a class="navbar-brand-text" href="{{ $.Site.Home.RelPermalink }}">{{ $.Site.Title }}</a>
         </div>
         <div class="navbar-toggler-area">
+            {{- if $.Site.IsMultiLingual -}}
             <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#main-language-navbar" aria-expanded="false" aria-controls="main-language-navbar" aria-label="{{ T "select_language" }}">
                 <span class="navbar-language-icon"></span>
             </button>
+            {{- end -}}
             <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#main-navbar" aria-expanded="false" aria-controls="main-navbar" aria-label="{{ T "toggle_navigation" }}">
                 <span class="navbar-toggler-icon"></span>
             </button>
