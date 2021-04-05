@@ -360,6 +360,10 @@ ul.navbar-nav li.nav-item {
     vertical-align: top;
 }
 
+.navbar-toggler-area button {
+    margin-left: .25em;
+}
+
 .navbar-language-icon::before {
     content: '\f0ac';
     display: inline-block;
@@ -374,18 +378,7 @@ ul.navbar-nav li.nav-item {
     vertical-align: middle;
 }
 
-@media (max-width: 991.98px) { #main-navigation .navbar-brand .navbar-brand-text { max-width: 520px; } }
-@media (max-width: 800px)    { #main-navigation .navbar-brand .navbar-brand-text { max-width: 470px; } }
-@media (max-width: 750px)    { #main-navigation .navbar-brand .navbar-brand-text { max-width: 420px; } }
-@media (max-width: 700px)    { #main-navigation .navbar-brand .navbar-brand-text { max-width: 370px; } }
-@media (max-width: 650px)    { #main-navigation .navbar-brand .navbar-brand-text { max-width: 320px; } }
-@media (max-width: 600px)    { #main-navigation .navbar-brand .navbar-brand-text { max-width: 270px; } }
-@media (max-width: 550px)    { #main-navigation .navbar-brand .navbar-brand-text { max-width: 220px; } }
-@media (max-width: 500px)    { #main-navigation .navbar-brand .navbar-brand-text { max-width: 170px; } }
-@media (max-width: 450px)    { #main-navigation .navbar-brand .navbar-brand-text { max-width: 120px; } }
-@media (max-width: 400px)    { #main-navigation .navbar-brand .navbar-brand-text { max-width:  70px; } }
-@media (max-width: 350px)    { #main-navigation .navbar-brand .navbar-brand-text { max-width:  20px; } }
-@media (max-width: 300px)    { #main-navigation .navbar-brand .navbar-brand-text { max-width:   0px; } }
+@media (max-width: 300px)    { #main-navigation .navbar-brand .navbar-brand-text { max-width: 0; } }
 
 @media (max-width: 991.98px) {
     #main-navigation #main-language-navbar {

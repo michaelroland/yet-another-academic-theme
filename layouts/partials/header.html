@@ -18,7 +18,7 @@ Context: The current page context.
             {{ if $.Site.Params.icon }}<a class="navbar-brand-icon" href="{{ $.Site.Home.RelPermalink }}"><img src="{{ $.Site.Params.icon | relURL }}" height="39" alt=" " title=""></a>{{ end }}
             <a class="navbar-brand-text" href="{{ $.Site.Home.RelPermalink }}">{{ $.Site.Title }}</a>
         </div>
-        <div class="navbar-toggler-area">
+        <div class="navbar-toggler-area ml-auto">
             {{- if $.Site.IsMultiLingual -}}
             <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#main-language-navbar" aria-expanded="false" aria-controls="main-language-navbar" aria-label="{{ T "select_language" }}">
                 <span class="navbar-language-icon"></span>
