@@ -544,7 +544,7 @@ ul.navbar-nav li.nav-item {
 }
 
 #main-breadcrumb .breadcrumb {
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     background: none;
     border-radius: 0;
     margin: 0;
@@ -554,16 +554,17 @@ ul.navbar-nav li.nav-item {
 #main-breadcrumb .breadcrumb .breadcrumb-item {
     color: #000;
     list-style: none;
-    height: 36px;
+    height: 1.5em;
+    margin: 0;
     padding-left: 0;
-    padding-right: 0.5rem;
+    padding-right: 0.5em;
 }
 
 #main-breadcrumb .breadcrumb .breadcrumb-item a {
     color: #fff;
     background-color: #33B5E5;
-    border-radius: 0.25rem;
-    padding: 0.3rem 0.75rem;
+    border-radius: 0.25em;
+    padding: 0.3em 0.75em;
     text-decoration: none;
 }
 
@@ -575,7 +576,7 @@ ul.navbar-nav li.nav-item {
 }
 
 #main-breadcrumb .breadcrumb-item.breadcrumb-home {
-    font-size: 24px;
+    font-size: 1.5em;
     line-height: 1;
 }
 
@@ -599,9 +600,9 @@ ul.navbar-nav li.nav-item {
     display: inline-block;
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
-    font-size: 1rem;
+    font-size: 1.1em;
     padding-left: 0;
-    padding-right: 0.5rem;
+    padding-right: 0.5em;
 }
 
 #main-breadcrumb .breadcrumb-item.breadcrumb-home::before {

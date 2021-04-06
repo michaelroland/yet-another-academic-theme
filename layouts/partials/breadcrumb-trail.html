@@ -13,41 +13,38 @@ Context: The current page context.
 
 */ -}}
 {{- $breadcrumb_show := $.Param "breadcrumb" -}}
+{{- $breadcrumb_show_active := $.Param "breadcrumb_include_active" -}}
 {{- $url := replace .Permalink $.Site.Home.Permalink "" -}}
 {{- $url = trim $url "/" -}}
 {{- if and $breadcrumb_show $url -}}
+    {{- $breadcrumb_depth := $.Param "breadcrumb_depth" -}}
+    {{- if not $breadcrumb_depth -}}
+        {{- $breadcrumb_depth = 3 -}}
+    {{- end }}
+    {{- $breadcrumb_depth = $breadcrumb_depth | add -1 -}}
+    {{- $breadcrumb_pages := slice -}}
+    {{- $breadcrumb_url := "" -}}
+    {{- range split $url "/" -}}
+        {{- if . -}}
+            {{- $breadcrumb_url = print $breadcrumb_url "/" . -}}
+            {{- with $.Site.GetPage $breadcrumb_url }}
+                {{ if ne . $.Page }}
+                    {{- $breadcrumb_pages = $breadcrumb_pages | append . -}}
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+    {{- $breadcrumb_count := len $breadcrumb_pages -}}
+    {{- if or (gt $breadcrumb_count 0) $breadcrumb_show_active -}}
 <div class="row">
     <nav id="main-breadcrumb" aria-label="breadcrumb">
         <ol class="breadcrumb">
         {{- with $.Site.Home -}}
             <li class="breadcrumb-item breadcrumb-home">
-            {{- $target_url := .RelPermalink -}}
-            {{- $allow_url_attrs := false -}}
-            {{- with .Params.target -}}
-                {{- $target_url = . -}}
-                {{- $allow_url_attrs = true -}}
-            {{- end -}}
-            {{- partial "render-link" (dict "Page" $.Page "Destination" $target_url "Title" .LinkTitle "InnerHTML" "<i class=\"fas fa-home\"></i>" "AllowUrlAttrs" $allow_url_attrs) -}}
+            {{- $pagemeta := partial "function-content-meta" (dict "Page" . "Params" .Params) -}}
+            {{- partial "render-link" (dict "Page" $.Page "Destination" $pagemeta.permalink "Title" .LinkTitle "InnerHTML" "<i class=\"fas fa-home\"></i>" "AllowUrlAttrs" true) -}}
             </li>
         {{- end -}}
-        {{- $breadcrumb_depth := $.Param "breadcrumb_depth" -}}
-        {{- if not $breadcrumb_depth -}}
-            {{- $breadcrumb_depth = 3 -}}
-        {{- end }}
-        {{- $breadcrumb_depth = $breadcrumb_depth | add -1 -}}
-        {{- $breadcrumb_pages := slice -}}
-        {{- $breadcrumb_url := "" -}}
-        {{- range split $url "/" -}}
-            {{- if . -}}
-                {{- $breadcrumb_url = print $breadcrumb_url "/" . -}}
-                {{- with $.Site.GetPage $breadcrumb_url }}
-                    {{ if ne . $.Page }}
-                        {{- $breadcrumb_pages = $breadcrumb_pages | append . -}}
-                    {{- end -}}
-                {{- end -}}
-            {{- end -}}
-        {{- end -}}
-        {{- $breadcrumb_count := len $breadcrumb_pages -}}
         {{- if lt $breadcrumb_count $breadcrumb_depth -}}
             {{- $breadcrumb_depth = $breadcrumb_count -}}
         {{- else if gt $breadcrumb_count $breadcrumb_depth -}}
@@ -55,17 +52,15 @@ Context: The current page context.
         {{- end -}}
         {{- range $breadcrumb_pages | after (sub (len $breadcrumb_pages) $breadcrumb_depth) -}}
             <li class="breadcrumb-item">
-            {{- $target_url := .RelPermalink -}}
-            {{- $allow_url_attrs := false -}}
-            {{- with .Params.target -}}
-                {{- $target_url = . -}}
-                {{- $allow_url_attrs = true -}}
-            {{- end -}}
-            {{- partial "render-link" (dict "Page" $.Page "Destination" $target_url "Title" "" "InnerHTML" .LinkTitle "AllowUrlAttrs" $allow_url_attrs) -}}
+            {{- $pagemeta := partial "function-content-meta" (dict "Page" . "Params" .Params) -}}
+            {{- partial "render-link" (dict "Page" $.Page "Destination" $pagemeta.permalink "AllowUrlAttrs" true) -}}
             </li>
         {{- end -}}
+        {{- if $breadcrumb_show_active -}}
             <li class="breadcrumb-item active">{{ .LinkTitle }}</li>
+        {{- end -}}
         </ol>
     </nav>
 </div>
+    {{- end -}}
 {{- end -}}
