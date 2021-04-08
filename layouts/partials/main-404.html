@@ -12,30 +12,29 @@ Partial: Render the main part of the "Not found" (404) error page.
 Context: The current page context.
 
 */ -}}
-<main id="main" class="container-fluid px-0 error error-404">
+<main id="main" class="container-fluid error error-404">
     <div class="container container-fluid-lg">
-        {{- if .Param "breadcrumb" -}}
+        {{- $breadcrumb_show := $.Param "breadcrumb" -}}
+        {{- $breadcrumb_show_active := $.Param "breadcrumb_include_active" -}}
+        {{- if and $breadcrumb_show $breadcrumb_show_active -}}
         <div class="row">
             <nav id="main-breadcrumb" aria-label="breadcrumb">
                 <ol class="breadcrumb">
                 {{- with $.Site.Home -}}
                     <li class="breadcrumb-item breadcrumb-home">
-                    {{- $target_url := .RelPermalink -}}
-                    {{- $allow_url_attrs := false -}}
-                    {{- with .Params.target -}}
-                        {{- $target_url = . -}}
-                        {{- $allow_url_attrs = true -}}
-                    {{- end -}}
-                    {{- partial "render-link" (dict "Page" . "Destination" $target_url "Title" .LinkTitle "InnerHTML" "<i class=\"fas fa-home\"></i>" "AllowUrlAttrs" $allow_url_attrs) -}}
+                    {{- $pagemeta := partial "function-content-meta" (dict "Page" . "Params" .Params) -}}
+                    {{- partial "render-link" (dict "Page" $.Page "Destination" $pagemeta.permalink "Title" .LinkTitle "InnerHTML" "<i class=\"fas fa-home\"></i>" "AllowUrlAttrs" true) -}}
                     </li>
                 {{- end -}}
+                {{- if $breadcrumb_show_active -}}
                     <li class="breadcrumb-item active">{{ T "error_404_title" }}</li>
+                {{- end -}}
                 </ol>
             </nav>
         </div>
         {{- end -}}
         <div class="row">
-            <div class="col-12 mb-5">
+            <div class="col-12">
                 <article id="main-content" class="main-content">
                     <h1 id="error-404">{{ T "error_404_title" }}</h1>
                     <p>{{ T "error_404_info" }}</p>
