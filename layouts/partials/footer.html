@@ -14,7 +14,7 @@ Context: The current page context.
 */ -}}
 <footer id="footer" class="container-fluid bg-dark" role="contentinfo">
     <div class="container container-fluid-lg">
-        <div class="row justify-content-center links-footer">
+        <div class="row links-footer">
             <div class="col-12 col-md-6 pb-2 pb-md-0 text-center text-md-left">
                 <nav id="footer-navigation">
                     <ul id="footer-menu" class="footer-menu">
@@ -68,7 +68,7 @@ Context: The current page context.
                 </ul>
             </div>
         </div>
-        <div class="row justify-content-center copyright-footer">
+        <div class="row copyright-footer">
             <div class="col-12 col-md-5 pb-2 pb-md-0 text-center text-md-left">
             {{- with $.Site.Copyright -}}
                 {{ T "copyright" | safeHTML }}&nbsp;{{ now.Format "2006" }} {{ . | safeHTML }}

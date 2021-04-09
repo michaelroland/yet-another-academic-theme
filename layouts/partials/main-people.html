@@ -15,12 +15,12 @@ Context: The current page context.
 {{- $pagedata := partial "function-content-meta" (dict "Page" .Page "Params" .Params) -}}
 {{- $sidebarwidgets := partial "function-prepare-sidebar-widgets" (dict "Page" .Page "Params" .Params) -}}
 
-<main id="main" class="container-fluid px-0 {{ $.Type }} {{ $.Kind }} {{ $.Type }}-{{ with $pagedata.uniqueid }}{{ . }}{{ else }}none{{ end }}">
+<main id="main" class="container-fluid {{ $.Type }} {{ $.Kind }} {{ $.Type }}-{{ with $pagedata.uniqueid }}{{ . }}{{ else }}none{{ end }}">
     {{- partial "content-featured" $pagedata -}}
     <div class="container container-fluid-lg">
         {{- partial "breadcrumb-trail" . -}}
         <div class="row">
-            <div class="col-12{{ if $sidebarwidgets.sidebar_show }} col-md-9{{ end }} mb-3">
+            <div class="col-12{{ if $sidebarwidgets.sidebar_show }} col-md-9{{ end }}">
                 {{- partial "content-biography" $pagedata -}}
                 {{- partial "content-main" $pagedata -}}
                 {{- partial "content-supplementary" $pagedata -}}
