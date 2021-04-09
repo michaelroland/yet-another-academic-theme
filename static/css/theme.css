@@ -1654,8 +1654,7 @@ a.card-hover:focus {
     overflow: hidden;
 }
 
-.post-preview-list .authored-date,
-#main .post-preview-list .authored-date {
+.post-preview-list .authored-date {
     font-style: normal;
     font-size: 1.0em;
 }
@@ -1674,7 +1673,7 @@ a.card-hover:focus {
  * 
 \******************************************************************************/
 
-#main .authored-date,
-#main .author {
+.post-metadata .authored-date,
+.post-metadata .author {
     font-size: 0.875em;
 }

@@ -12,6 +12,7 @@ Partial: Render authoring information of a page.
 Context: The current content meta context of a page.
 
 */ -}}
+<div class="post-metadata">
 {{- if .display_date -}}
     {{- if .moddate.date -}}
     <div class="authored-date pr-3 d-flex flex-row">
@@ -36,3 +37,4 @@ Context: The current content meta context of a page.
     </div>
     {{- end -}}
 {{- end -}}
+</div>
