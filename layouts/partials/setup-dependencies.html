@@ -16,6 +16,8 @@ Context: The current page context.
 {{- $scripts := slice -}}
 {{- $scripts_delayed := slice -}}
 
+{{- $debug := true -}}
+
 {{- /* jQuery */ -}}
 {{- $ver := "3.6.0" -}}
 {{- $scripts = $scripts | append (dict "url" ((printf "libs/jquery-%[1]s/js/jquery-%[1]s.min.js?ver=%[1]s" $ver) | relURL)) -}}
@@ -34,15 +36,21 @@ Context: The current page context.
 {{- $styles = $styles | append (dict "url" ((printf "libs/academicons-%[1]s/css/academicons.min.css?ver=%[1]s" $ver) | relURL)) -}}
 
 {{- /* Theme */ -}}
-{{- $ver := "1.0.0" -}}
-{{- $styles = $styles | append (dict "url" ((printf "css/theme.css?ver=%[1]s" $ver) | relURL)) -}}
+{{- $ver := "0.0.0" -}}
+{{- with .GitInfo -}}
+    {{- $ver = .AbbreviatedHash -}}
+{{- end -}}
+{{- $theme_style := resources.Get "scss/main.scss" | resources.ToCSS (dict "targetPath" "css/main.css" "enableSourceMap" $debug) -}}
+{{- if not $debug -}}
+    {{- $theme_style = $theme_style | minify -}}
+{{- end -}}
+{{- $styles = $styles | append (dict "url" (printf "%[1]s?ver=%[2]s" $theme_style.RelPermalink $ver)) -}}
 {{- $scripts = $scripts | append (dict "url" ((printf "js/theme.js?ver=%[1]s" $ver) | relURL)) -}}
 {{- $scripts_delayed = $scripts_delayed | append (dict "url" ((printf "js/theme_delayed.js?ver=%[1]s" $ver) | relURL)) -}}
 
 {{- /* Site-specific overrides */ -}}
-{{- $styles = $styles | append (dict "url" ("css/site.css" | relURL)) -}}
-{{- $scripts = $scripts | append (dict "url" ("js/site.js" | relURL)) -}}
-{{- $scripts_delayed = $scripts_delayed | append (dict "url" ("js/site_delayed.js" | relURL)) -}}
+{{- $scripts = $scripts | append (dict "url" ((printf "js/site.js?ver=%[1]s" $ver) | relURL)) -}}
+{{- $scripts_delayed = $scripts_delayed | append (dict "url" ((printf "js/site_delayed.js?ver=%[1]s" $ver) | relURL)) -}}
 
 {{- $deps := dict "styles" $styles "scripts" $scripts "scripts_delayed" $scripts_delayed -}}
 {{- return $deps -}}
