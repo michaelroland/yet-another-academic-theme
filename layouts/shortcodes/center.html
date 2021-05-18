@@ -13,7 +13,5 @@ Note: This shortcode expects an ".Inner" body and, therefore, needs to be closed
 
 */ -}}
 <center>
-{{- with .Inner -}}
-    {{- . | markdownify -}}
-{{- end -}}
+{{- .Inner | markdownify -}}
 </center>
