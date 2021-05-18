@@ -13,5 +13,5 @@ Note: This shortcode expects an ".Inner" body and, therefore, needs to be closed
 
 */ -}}
 <center>
-{{- .Inner | markdownify -}}
+{{- .Inner | .Page.RenderString -}}
 </center>
