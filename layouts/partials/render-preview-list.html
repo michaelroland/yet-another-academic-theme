@@ -38,8 +38,8 @@ Page-level Params:
 
 {{- $column_classes := site.Data.theme.preview_list.column_breakpoints.default -}}
 {{- with $max_columns -}}
-    {{- if isset site.Data.theme.preview_list.column_breakpoints . -}}
-        {{- $column_classes = index site.Data.theme.preview_list.column_breakpoints . -}}
+    {{- if isset site.Data.theme.preview_list.column_breakpoints (string .) -}}
+        {{- $column_classes = index site.Data.theme.preview_list.column_breakpoints (string .) -}}
     {{- end -}}
 {{- end -}}
 
