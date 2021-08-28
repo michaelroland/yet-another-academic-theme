@@ -1481,6 +1481,11 @@ a.card-hover:focus {
     left: 2px;
 }
 
+.card-hover.invert-color,
+a.card-hover.invert-color {
+    color: $palette-primary-bg;
+}
+
 .card-hover .link {
     color: $palette-accent-base;
 }

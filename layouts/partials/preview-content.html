@@ -49,7 +49,11 @@ Page-level Params:
     {{- end -}}
 {{- end -}}
 
-{{- $preview_link := split (partial "render-link" (dict "Page" $.Entry.Page "Destination" $.Entry.permalink "InnerHTML" "<<!!!>>" "Class" "card card-hover post-preview" "AllowUrlAttrs" true)) "<<!!!>>" -}}
+{{- $card_class := "card card-hover post-preview" -}}
+{{- with $.Entry.preview_invert -}}
+    {{- $card_class = printf "%s invert-color" $card_class -}}
+{{- end -}}
+{{- $preview_link := split (partial "render-link" (dict "Page" $.Entry.Page "Destination" $.Entry.permalink "InnerHTML" "<<!!!>>" "Class" $card_class "AllowUrlAttrs" true)) "<<!!!>>" -}}
 {{- index $preview_link 0 | safeHTML -}}
     <div class="card-header card-header-img"{{ with $.Entry.preview_icon }} style="background-image: url('{{ . | safeURL }}');"{{ end }}>
         <h4 class="card-title">{{ $.Entry.Page.Title }}</h4>

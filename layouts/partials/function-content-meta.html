@@ -36,6 +36,7 @@ Return: A content metadata structure that consists of
     .is_special_bundle  
     .permalink          
     .preview_icon       
+    .preview_invert     
 
 */ -}}
 {{- $authors := dict -}}
@@ -184,6 +185,7 @@ Return: A content metadata structure that consists of
 {{- $is_referal_page := false -}}
 {{- $permalink := "" -}}
 {{- $preview_icon := "" -}}
+{{- $preview_invert := false -}}
 {{- with .Page -}}
     {{- $permalink = .RelPermalink -}}
 {{- end -}}
@@ -202,6 +204,9 @@ Return: A content metadata structure that consists of
         {{- end -}}
         {{- $preview_icon = $preview_icon_url -}}
     {{- end -}}
+    {{- with .preview_invert -}}
+        {{- $preview_invert = . -}}
+    {{- end -}}
 {{- end -}}
 
 {{- $result := dict "Page" .Page "Params" .Params -}}
@@ -213,5 +218,5 @@ Return: A content metadata structure that consists of
 {{- $result = merge $result (dict "abstract" $abstract "features" $features "main" $main_content "supplementary" $supplementary_content) -}}
 {{- $result = merge $result (dict "is_regular_page" $is_regular_page "is_referal_page" $is_referal_page "is_special_bundle" $is_special_bundle) -}}
 {{- $result = merge $result (dict "permalink" $permalink) -}}
-{{- $result = merge $result (dict "preview_icon" $preview_icon) -}}
+{{- $result = merge $result (dict "preview_icon" $preview_icon "preview_invert" $preview_invert) -}}
 {{- return $result -}}
