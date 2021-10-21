@@ -112,6 +112,9 @@ other = ", in"
 [in_journal]
 other = ","
 
+[interview]
+other = "Interview"
+
 [invited_talk]
 other = "Gastvortrag"
 

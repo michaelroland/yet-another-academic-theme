@@ -23,6 +23,7 @@ Context: The current publication data context.
 {{- $talk_types := $talk_types | append (dict "type" "keynote"      "title" (T "keynote")) -}}
 {{- $talk_types := $talk_types | append (dict "type" "guestlecture" "title" (T "guest_lecture")) -}}
 {{- $talk_types := $talk_types | append (dict "type" "moderation"   "title" (T "moderation")) -}}
+{{- $talk_types := $talk_types | append (dict "type" "interview"    "title" (T "interview")) -}}
 {{- $talk_type := "" -}}
 {{- if .talk_type -}}
     {{- range $talk_types -}}
