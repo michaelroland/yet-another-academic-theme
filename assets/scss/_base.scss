@@ -1339,6 +1339,10 @@ a.heading-anchor:focus-within {
     margin-bottom: 1.0rem;
 }
 
+.publication-entry:target {
+    color: $palette-accent-dark;
+}
+
 .publication-citation {
     text-align: justify;
 }

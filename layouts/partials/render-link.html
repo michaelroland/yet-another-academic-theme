@@ -119,6 +119,58 @@ Param: AllowUrlAttrs    If true, allow target, rel, and class attributes as pref
     {{- end -}}
 {{- end -}}
 
+{{- if hasPrefix $url "pub:" -}}
+    {{- $publications_bundle_current_lang := site.GetPage (printf "/%s" site.Data.theme.config.publications_bundle) -}}
+    {{- $publications_bundle_default_lang := site.Sites.First.GetPage (printf "/%s" site.Data.theme.config.publications_bundle) -}}
+    {{- $publications := $publications_bundle_current_lang.Pages | lang.Merge $publications_bundle_default_lang.Pages -}}
+    {{- $publications = where $publications "File.ContentBaseName" "==" (strings.TrimPrefix "pub:" $url) -}}
+    {{- $pub := false -}}
+    {{- if gt (len $publications) 0 -}}
+        {{- $pub = index $publications 0 -}}
+    {{- end -}}
+    {{- with $pub -}}
+        {{- $url_rel = printf "%s#pub-%s" $publications_bundle_current_lang.RelPermalink .File.UniqueID -}}
+        {{- $url_abs = printf "%s#pub-%s" $publications_bundle_current_lang.Permalink .File.UniqueID -}}
+        {{- $url_display = $url -}}
+        {{- $url_asis = true -}}
+        {{- if not $class -}}
+            {{- $class = "pubref" -}}
+        {{- end -}}
+    {{- else -}}
+        {{- warnf "Publication reference %q not found" $url -}}
+    {{- end -}}
+{{- end -}}
+
+{{- if hasPrefix $url "talk:" -}}
+    {{- $talks_bundle_current_lang := site.GetPage (printf "/%s" site.Data.theme.config.talks_bundle) -}}
+    {{- $talks_bundle_default_lang := site.Sites.First.GetPage (printf "/%s" site.Data.theme.config.talks_bundle) -}}
+    {{- $talks := $talks_bundle_current_lang.Pages | lang.Merge $talks_bundle_default_lang.Pages -}}
+    {{- $talks = where $talks "File.ContentBaseName" "==" (strings.TrimPrefix "talk:" $url) -}}
+    {{- $pub := false -}}
+    {{- if gt (len $talks) 0 -}}
+        {{- $pub = index $talks 0 -}}
+    {{- else -}}
+        {{- $publications_bundle_current_lang := site.GetPage (printf "/%s" site.Data.theme.config.publications_bundle) -}}
+        {{- $publications_bundle_default_lang := site.Sites.First.GetPage (printf "/%s" site.Data.theme.config.publications_bundle) -}}
+        {{- $publications := $publications_bundle_current_lang.Pages | lang.Merge $publications_bundle_default_lang.Pages -}}
+        {{- $publications = where $publications "File.ContentBaseName" "==" (strings.TrimPrefix "talk:" $url) -}}
+        {{- if gt (len $publications) 0 -}}
+            {{- $pub := index $publications 0 -}}
+        {{- end -}}
+    {{- end -}}
+    {{- with $pub -}}
+        {{- $url_rel = printf "%s#pub-%s" $talks_bundle_current_lang.RelPermalink .File.UniqueID -}}
+        {{- $url_abs = printf "%s#pub-%s" $talks_bundle_current_lang.Permalink .File.UniqueID -}}
+        {{- $url_display = $url -}}
+        {{- $url_asis = true -}}
+        {{- if not $class -}}
+            {{- $class = "talkref" -}}
+        {{- end -}}
+    {{- else -}}
+        {{- warnf "Talk reference %q not found" $url -}}
+    {{- end -}}
+{{- end -}}
+
 {{- if not $url_asis -}}
     {{- with .Page -}}
         {{- with .Resources.GetMatch $url -}}
