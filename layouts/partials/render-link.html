@@ -200,9 +200,9 @@ Param: AllowUrlAttrs    If true, allow target, rel, and class attributes as pref
                 {{- end -}}
             {{- end -}}
             {{- with $page -}}
-                {{- $pagemeta := partial "function-content-meta" (dict "Page" . "Params" .Params) -}}
-                {{- $url_rel = $pagemeta.permalink -}}
-                {{- $url_abs = $pagemeta.permalink | absURL -}}
+                {{- $pagelink := partial "function-content-permalink" (dict "Page" . "Params" .Params) -}}
+                {{- $url_rel = $pagelink.permalink -}}
+                {{- $url_abs = $pagelink.permalink | absURL -}}
                 {{- $url_display = .LinkTitle -}}
             {{- end -}}
         {{- end -}}

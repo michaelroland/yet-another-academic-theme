@@ -182,18 +182,11 @@ Return: A content metadata structure that consists of
     {{- end -}}
 {{- end -}}
 
-{{- $is_referal_page := false -}}
-{{- $permalink := "" -}}
+{{- $permalink := partial "function-content-permalink" (dict "Page" .Page "Params" .Params) -}}
+
 {{- $preview_icon := "" -}}
 {{- $preview_invert := false -}}
-{{- with .Page -}}
-    {{- $permalink = .RelPermalink -}}
-{{- end -}}
 {{- with .Params -}}
-    {{- with .target -}}
-        {{- $permalink = . -}}
-        {{- $is_referal_page = true -}}
-    {{- end -}}
     {{- with .preview_icon -}}
         {{- $preview_icon = . -}}
         {{- $preview_icon_url := . | relURL -}}
@@ -216,7 +209,7 @@ Return: A content metadata structure that consists of
 {{- $result = merge $result (dict "key" $key "uniquekey" $uniquekey) -}}
 {{- $result = merge $result (dict "has_content" (or (gt (len $abstract) 0) (gt (len $features) 0) (gt (len $main_content) 0) (gt (len $supplementary_content) 0))) -}}
 {{- $result = merge $result (dict "abstract" $abstract "features" $features "main" $main_content "supplementary" $supplementary_content) -}}
-{{- $result = merge $result (dict "is_regular_page" $is_regular_page "is_referal_page" $is_referal_page "is_special_bundle" $is_special_bundle) -}}
-{{- $result = merge $result (dict "permalink" $permalink) -}}
+{{- $result = merge $result (dict "is_regular_page" $is_regular_page "is_referal_page" $permalink.is_referal_page "is_special_bundle" $is_special_bundle) -}}
+{{- $result = merge $result (dict "permalink" $permalink.permalink) -}}
 {{- $result = merge $result (dict "preview_icon" $preview_icon "preview_invert" $preview_invert) -}}
 {{- return $result -}}
