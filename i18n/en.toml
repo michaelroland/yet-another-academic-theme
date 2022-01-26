@@ -32,6 +32,9 @@ other = "audio"
 [authored_by]
 other = "by"
 
+[award]
+other = "award"
+
 [bachelor_thesis]
 other = "Bachelor's thesis"
 
@@ -47,11 +50,20 @@ other = "vol.&nbsp;{{ .volume }}"
 [bug_report]
 other = "Bug report"
 
+[bugreport]
+other = "bug report"
+
+[buy]
+other = "buy"
+
 [chapter_number]
 other = "Chapter&nbsp;{{ .number }}"
 
 [copyright]
 other = "Copyright &copy;"
+
+[dataset]
+other = "dataset"
 
 [date_format]
 other = "{{ with .dd }}{{ . }}{{ end }}{{ if .m2 }} {{ .mmmm }}{{ if .yyyy2 }} {{ .yyyy }}{{ end }} {{ end }}{{ if .d2 }}--{{ if .m2 }} {{ end }}{{ .dd2 }}{{ end }}{{ if .m2 }} {{ .mmmm2 }}{{ else }} {{ .mmmm }}{{ end }}{{ if .yyyy2 }} {{ .yyyy2 }}{{ else }} {{ .yyyy }}{{ end }}"
@@ -93,6 +105,9 @@ other = "Event"
 
 [external]
 other = ""
+
+[file]
+other = "file"
 
 [fullname]
 other = "{{ with .firstname }}{{ . }} {{ end }}{{ .lastname }}"
@@ -142,6 +157,9 @@ other = "LCCN{{ with .lccn }} {{ . }}{{ end }}"
 [lccn_uri]
 other = "https://lccn.loc.gov/{{ .lccn }}"
 
+[link]
+other = "link"
+
 [main_menu]
 other = "Main menu"
 
@@ -150,6 +168,9 @@ other = "Master's thesis"
 
 [moderation]
 other = "Moderation"
+
+[more]
+other = "more"
 
 [next_page]
 other = "Next page"
@@ -164,6 +185,9 @@ other = "pp.&nbsp;%s"
 
 [pagination_navigation]
 other = "Pagination navigation"
+
+[permalink]
+other = "permalink"
 
 [phd_thesis]
 other = "Ph.D. thesis"
@@ -186,6 +210,9 @@ other = "Continue reading ..."
 [recent_content_on]
 other = "Recent content on %s"
 
+[school]
+other = "school"
+
 [scroll_to_top]
 other = "scroll to top"
 
@@ -201,6 +228,9 @@ other = "Read more ..."
 [slides]
 other = "slides"
 
+[slideshare]
+other = "slideshare"
+
 [table_of_contents]
 other = "Table of Contents"
 
@@ -213,11 +243,17 @@ other = "Toggle navigation"
 [video]
 other = "video"
 
+[vimeo]
+other = "Vimeo"
+
 [vulnerability_report]
 other = "Vulnerability report"
 
 [workshop]
 other = "Workshop"
+
+[youtube]
+other = "YouTube"
 
 [Mon]
 other = "{{ with .abbrev }}Mon.{{ else }}Monday{{ end }}"

@@ -32,6 +32,9 @@ other = "Audio"
 [authored_by]
 other = "von"
 
+[award]
+other = "Auszeichnung"
+
 [bachelor_thesis]
 other = "Bachelorarbeit"
 
@@ -47,11 +50,20 @@ other = "Vol.&nbsp;{{ .volume }}"
 [bug_report]
 other = "Fehlerbericht"
 
+[bugreport]
+other = "Fehlerbericht"
+
+[buy]
+other = "Kaufen"
+
 [chapter_number]
 other = "Kapitel&nbsp;{{ .number }}"
 
 [copyright]
 other = "Copyright &copy;"
+
+[dataset]
+other = "Datensatz"
 
 [date_format]
 other = "{{ with .dd }}{{ . }}{{ end }}{{ if .m2 }} {{ .mmmm }}{{ if .yyyy2 }} {{ .yyyy }}{{ end }} {{ end }}{{ if .d2 }}--{{ if .m2 }} {{ end }}{{ .dd2 }}{{ end }}{{ if .m2 }} {{ .mmmm2 }}{{ else }} {{ .mmmm }}{{ end }}{{ if .yyyy2 }} {{ .yyyy2 }}{{ else }} {{ .yyyy }}{{ end }}"
@@ -93,6 +105,9 @@ other = "Veranstaltung"
 
 [external]
 other = ""
+
+[file]
+other = "Datei"
 
 [fullname]
 other = "{{ with .firstname }}{{ . }} {{ end }}{{ .lastname }}"
@@ -142,6 +157,9 @@ other = "LCCN{{ with .lccn }} {{ . }}{{ end }}"
 [lccn_uri]
 other = "https://lccn.loc.gov/{{ .lccn }}"
 
+[link]
+other = "Link"
+
 [main_menu]
 other = "Hauptmenü"
 
@@ -150,6 +168,9 @@ other = "Masterarbeit"
 
 [moderation]
 other = "Moderation"
+
+[more]
+other = "Details"
 
 [next_page]
 other = "nächste Seite"
@@ -164,6 +185,9 @@ other = "S.&nbsp;%s"
 
 [pagination_navigation]
 other = "Seitenwechsel-Navigation"
+
+[permalink]
+other = "Permalink"
 
 [phd_thesis]
 other = "Doktorarbeit"
@@ -186,6 +210,9 @@ other = "Weiterlesen ..."
 [recent_content_on]
 other = "Neue Inhalte auf %s"
 
+[school]
+other = "Bildungseinrichtung"
+
 [scroll_to_top]
 other = "zum Seitenanfang"
 
@@ -201,6 +228,9 @@ other = "Language"
 [slides]
 other = "Slides"
 
+[slideshare]
+other = "Slide Share"
+
 [table_of_contents]
 other = "Inhaltsverzeichnis"
 
@@ -213,11 +243,17 @@ other = "Menüführung einblenden"
 [video]
 other = "Video"
 
+[vimeo]
+other = "Vimeo"
+
 [vulnerability_report]
 other = "Schwachstellenbericht"
 
 [workshop]
 other = "Workshop"
+
+[youtube]
+other = "YouTube"
 
 [Mon]
 other = "{{ with .abbrev }}Mo.{{ else }}Montag{{ end }}"
