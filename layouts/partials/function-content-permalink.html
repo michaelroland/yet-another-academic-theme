@@ -1,0 +1,36 @@
+{{- /*
+******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Function: Assemble page/content permalink data.
+
+Param: Page      The page that content metadata should be assembled for.
+Param: Params    Dict of content/page parameters (usually, but not necessarily,
+           equivalent to "Page.Params").
+Param: Settings  Optional dict of local scope (e.g. shortcodes, previews) settings.
+
+Return: A content permalink structure that consists of
+    .is_referal_page    
+    .permalink          
+
+*/ -}}
+
+{{- $is_referal_page := false -}}
+{{- $permalink := "" -}}
+{{- with .Page -}}
+    {{- $permalink = .RelPermalink -}}
+{{- end -}}
+{{- with .Params -}}
+    {{- with .target -}}
+        {{- $permalink = . -}}
+        {{- $is_referal_page = true -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $result := (dict "is_referal_page" $is_referal_page "permalink" $permalink) -}}
+{{- return $result -}}
