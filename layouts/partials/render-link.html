@@ -79,7 +79,7 @@ Param: AllowUrlAttrs    If true, allow target, rel, and class attributes as pref
 
 {{- if and $allow_url_attrs (in $url "|") -}}
     {{- $attrs := delimit (split $url "|" | first 1) "" -}}
-    {{- $url = delimit (split $url "|" | after 1) "|" -}}
+    {{- $url = delimit (split $url "|" | after 1) "|" | string -}}
     {{- range split $attrs "," -}}
         {{- if in $config_html_attr_rel . -}}
             {{- $rel = $rel | union (slice .) -}}
