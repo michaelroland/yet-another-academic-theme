@@ -143,7 +143,12 @@ Page-level Params:
             {{- else if eq $base_type "heart" -}}
                 {{- $icon = "fas fa-heart" -}}
             {{- end -}}
+            {{- if eq $base_type "custom" -}}
+                {{- $icon = delimit (after 1 $type) ":" | string -}}
+        <div class="badge badge-custom"{{ with $tooltip }} data-toggle="tooltip" data-placement="auto" title="{{ . }}"{{ end }}>{{ with $icon }}{{- partial "render-image" (dict "Page" $pubdata.Page "Destination" "Title" "" "AltText" "" $icon "Class" "custom-icon") -}}{{ end }}</div>
+            {{- else -}}
         <div class="badge{{ with $color }} badge-{{ . }}{{ end }}"{{ with $tooltip }} data-toggle="tooltip" data-placement="auto" title="{{ . }}"{{ end }}>{{ with $icon }}<i class="icon {{ . }}"></i>{{ end }}<span class="label">{{ $title }}</span></div>
+            {{- end -}}
         {{- end -}}
     </div>
     {{- end -}}
