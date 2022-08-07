@@ -32,7 +32,7 @@ Inner: Display value for the V-Card element (defaults to "value" if empty).
 {{- with .Get (cond .IsNamedParams "type" 0) -}}
     {{- $elements := where site.Data.theme.vcard.elements "type" . -}}
     {{- if $elements -}}
-        {{- $element = index $elements 0 -}}
+        {{- $element := index $elements 0 -}}
         {{- $type = $element.type -}}
     {{- else -}}
         {{- $icon = . -}}
