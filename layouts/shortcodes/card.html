@@ -1,0 +1,76 @@
+{{- /*
+******  Copyright (c) 2019-2022 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Shortcode: Print a linked card.
+
+Note: This shortcode expects an ".Inner" body and, therefore, needs to be closed.
+
+Param 0: href         The destination URL, page path, or page resource name.
+Param 1: title        Optional card header.
+Param 2: icon         Optional card background image.
+Param 3:              Optional string consisting of attributes (target, rel, class) as allowed by the link renderer.
+Param: target         Optional link target attribute.
+Param: rel            Optional link rel attribute.
+Param: class          Optional class attribute for card/link.
+Param: style          Optional style attribute for card/link.
+Inner: Card body.
+
+*/ -}}
+{{- $url := "" -}}
+{{- $allow_url_attrs := true -}}
+{{- $title := "" -}}
+{{- $icon := "" -}}
+{{- $target := "" -}}
+{{- $rel := "" -}}
+{{- $class := "" -}}
+{{- $style := "" -}}
+
+{{- with .Get (cond .IsNamedParams "href" 0) -}}
+    {{- $url = . -}}
+{{- end -}}
+{{- with .Get (cond .IsNamedParams "title" 1) -}}
+    {{- $title = . -}}
+{{- end -}}
+{{- with .Get (cond .IsNamedParams "icon" 2) -}}
+    {{- $icon = . -}}
+{{- end -}}
+{{- if .IsNamedParams -}}
+    {{- $allow_url_attrs := false -}}
+    {{- with .Get "target" -}}
+        {{- $target = . -}}
+    {{- end -}}
+    {{- with .Get "rel" -}}
+        {{- $rel = . -}}
+    {{- end -}}
+    {{- with .Get "class" -}}
+        {{- $class = . -}}
+    {{- end -}}
+    {{- with .Get "style" -}}
+        {{- $style = . -}}
+    {{- end -}}
+{{- else -}}
+    {{- with .Get 3 -}}
+        {{- $url = printf "%s|%s" . $url -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $card_class := printf "card card-hover %s" $class -}}
+{{- $card_link := split (partial "render-link" (dict "Page" .Page "Destination" $url "Target" $target "Rel" $rel "Class" $card_class "Style" $style "AllowUrlAttrs" $allow_url_attrs "InnerHTML" "<<!!!>>")) "<<!!!>>" -}}
+{{- index $card_link 0 | safeHTML -}}
+    <div class="card-header card-header-img"{{ with $icon }} style="background-image: url('{{ . | safeURL }}');"{{ end }}>
+        {{- with $title -}}
+        <h4 class="card-title">{{ . }}</h4>
+        {{- end -}}
+    </div>
+    {{- with .Inner -}}
+    <div class="card-body">
+        {{- . -}}
+    </div>
+    {{- end -}}
+{{- index $card_link 1 | safeHTML -}}
