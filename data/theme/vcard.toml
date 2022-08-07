@@ -44,6 +44,11 @@ portrait_name = "portrait.*"
   is_url = true
 
 [[elements]]
+  type = "link"
+  icon = "fas fa-link"
+  is_url = true
+
+[[elements]]
   type = "phone"
   icon = "fas fa-phone-alt"
   is_url = true
