@@ -13,7 +13,8 @@ Context: The current content meta context of a page.
 
 */ -}}
 {{- range .features -}}
-<article id="featured-content-{{ .key }}" class="featured{{ if .background_image }} featured-background{{ end }} featured-{{ if .background_invert }}invert{{ else }}normal{{ end }}" style="{{ with .background_image }}background-image: url('{{ . | safeURL }}');{{ end }}">
+    {{- $anchor := .anchor | default (printf "content-%d" .key) -}}
+<article id="featured-{{ $anchor }}" class="featured{{ if .background_image }} featured-background{{ end }} featured-{{ if .background_invert }}invert{{ else }}normal{{ end }}" style="{{ with .background_image }}background-image: url('{{ . | safeURL }}');{{ end }}">
     <div class="container container-fluid-lg">
         <div class="row justify-content-center">
         {{- with .heading -}}
