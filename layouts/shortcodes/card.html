@@ -65,7 +65,7 @@ Inner: Card body.
 {{- index $card_link 0 | safeHTML -}}
     <div class="card-header card-header-img"{{ with $icon }} style="background-image: url('{{ . | safeURL }}');"{{ end }}>
         {{- with $title -}}
-        <h4 class="card-title">{{ . }}</h4>
+        <h4 class="card-title">{{ . | markdownify }}</h4>
         {{- end -}}
     </div>
     {{- with .Inner -}}
