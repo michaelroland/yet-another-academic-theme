@@ -84,11 +84,11 @@ Entry-level Params:
     {{- with .Param "biography.no_sociallinks" -}}
         {{- $no_sociallinks = . -}}
     {{- end -}}
-    {{- if isset . "biography.name_pre" -}}
-        {{- $vcard_displayname_pre = .name_pre -}}
+    {{- with .Param "biography.name_pre" -}}
+        {{- $vcard_displayname_pre = . -}}
     {{- end -}}
-    {{- if isset . "biography.name_post" -}}
-        {{- $vcard_displayname_post = .name_post -}}
+    {{- with .Param "biography.name_post" -}}
+        {{- $vcard_displayname_post = . -}}
     {{- end -}}
 {{- end -}}
 {{- with .Settings -}}
