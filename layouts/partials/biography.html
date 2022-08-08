@@ -25,6 +25,8 @@ Settings:
     vcard_hide_elements
     no_sociallinks
     vcard_innerhtml
+    name_pre
+    name_post
     [site.Data.theme.vcard.elements.*.type]
     [site.Data.theme.vcard.elements.*.type+.secondary]
 
@@ -36,6 +38,8 @@ Page-level Params:
     biography.vcard_hide_icons
     biography.vcard_hide_elements
     biography.no_sociallinks
+    biography.name_pre
+    biography.name_post
 
 Entry-level Params:
     portrait
@@ -56,6 +60,8 @@ Entry-level Params:
 {{- $vcard_hide_elements := slice -}}
 {{- $no_sociallinks := false -}}
 {{- $vcard_displayname := "" -}}
+{{- $vcard_displayname_pre := "" -}}
+{{- $vcard_displayname_post := "" -}}
 {{- with .Page -}}
     {{- with .Param "biography.portrait_size" -}}
         {{- $portrait_size = int . -}}
@@ -77,6 +83,12 @@ Entry-level Params:
     {{- end -}}
     {{- with .Param "biography.no_sociallinks" -}}
         {{- $no_sociallinks = . -}}
+    {{- end -}}
+    {{- if isset . "biography.name_pre" -}}
+        {{- $vcard_displayname_pre = .name_pre -}}
+    {{- end -}}
+    {{- if isset . "biography.name_post" -}}
+        {{- $vcard_displayname_post = .name_post -}}
     {{- end -}}
 {{- end -}}
 {{- with .Settings -}}
@@ -104,6 +116,12 @@ Entry-level Params:
     {{- if isset . "name" -}}
         {{- $vcard_displayname = .name -}}
     {{- end -}}
+    {{- if isset . "name_pre" -}}
+        {{- $vcard_displayname_pre = .name_pre -}}
+    {{- end -}}
+    {{- if isset . "name_post" -}}
+        {{- $vcard_displayname_post = .name_post -}}
+    {{- end -}}
     {{- if isset . "no_sociallinks" -}}
         {{- $no_sociallinks = .no_sociallinks -}}
     {{- end -}}
@@ -122,11 +140,24 @@ Entry-level Params:
 {{- with .Entry -}}
     {{- with .Page.Param "portrait" -}}
         {{- $portrait_name = . -}}
+    {{- else -}}
+        {{- with .Page.Resources.GetMatch $portrait_name -}}
+        {{- else -}}
+            {{- $portrait_name = "" -}}
+        {{- end -}}
     {{- end -}}
-    {{- $portrait_img_params := merge $portrait_img_params (dict "Page" .Page "Destination" $portrait_name) -}}
-    {{- $portrait_img = partial "render-image" $portrait_img_params -}}
-    {{- $portrait_small_img = partial "render-image" (merge $portrait_img_params $portrait_small_img_params) -}}
+    {{- if $portrait_name -}}
+        {{- $portrait_img_params := merge $portrait_img_params (dict "Page" .Page "Destination" $portrait_name) -}}
+        {{- $portrait_img = partial "render-image" $portrait_img_params -}}
+        {{- $portrait_small_img = partial "render-image" (merge $portrait_img_params $portrait_small_img_params) -}}
+    {{- end -}}
     {{- $vcard_displayname = .Page.Title -}}
+    {{- with .Page.Param "name_pre" -}}
+        {{- $vcard_displayname_pre = . -}}
+    {{- end -}}
+    {{- with .Page.Param "name_post" -}}
+        {{- $vcard_displayname_post = . -}}
+    {{- end -}}
 {{- end -}}
 {{- with .Settings -}}
     {{- if isset . "portrait" -}}
@@ -152,7 +183,7 @@ Entry-level Params:
             {{- . -}}
             <div class="media-body">
     {{- end -}}
-                <div class="vcard-name" role="heading" aria-level="6">{{ $vcard_displayname }}</div>
+                <div class="vcard-name" role="heading" aria-level="6">{{ with $vcard_displayname_pre }}{{ . | safeHTML  }}{{ end }}{{ $vcard_displayname }}{{ with $vcard_displayname_post }}{{ . | safeHTML  }}{{ end }}</div>
     {{- range $element := where site.Data.theme.vcard.elements ".type" "not in" $vcard_hide_elements -}}
         {{- $value := false -}}
         {{- $value_secondary := false -}}

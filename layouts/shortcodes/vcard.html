@@ -36,6 +36,8 @@ Param: portrait_size_small  Override default reduced portrait size (in px) for V
 Param: vcard_hide_icons     If true, do not display V-Card element icons; defaults to false.
 Param: vcard_hide_elements  An optional (comma-delimited) list of elements to hide
            from V-Card.
+Param: name_pre      Display name pre HTML code.
+Param: name_post     Display name post HTML code.
 
 Note: The following additional parameters only make sense when displaying a single entry.
 Param: portrait        Override the portrait displayed for the V-Card entry.
@@ -52,6 +54,8 @@ Page-level Params:
     biography.preview_limit
     biography.vcard_hide_icons
     biography.vcard_hide_elements
+    biography.name_pre
+    biography.name_post
 
 */ -}}
 {{- $people_bundle_current_lang := site.GetPage (printf "/%s" site.Data.theme.config.people_bundle) -}}
