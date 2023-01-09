@@ -29,6 +29,7 @@ Context: The current publication data context.
 {{- $classes = $classes | append (dict "type" "report-bug"      "name" "techreport"    "title" (.pub.Param "report_type" | default "Bug report")) -}}
 {{- $classes = $classes | append (dict "type" "report-eval"     "name" "techreport"    "title" (.pub.Param "report_type" | default "Evaluation report")) -}}
 {{- $classes = $classes | append (dict "type" "report-vuln"     "name" "techreport"    "title" (.pub.Param "report_type" | default "Vulnerability report")) -}}
+{{- $classes = $classes | append (dict "type" "report-preprint" "name" "online"        "title" "") -}}
 {{- $classes = $classes | append (dict "type" "thesis"          "name" "phdthesis"     "title" (.pub.Param "thesis_type" | default "")) -}}
 {{- $classes = $classes | append (dict "type" "thesis-"         "name" "thesis"        "title" (.pub.Param "thesis_type" | default "")) -}}
 {{- $classes = $classes | append (dict "type" "thesis-phd"      "name" "phdthesis"     "title" (.pub.Param "thesis_type" | default "")) -}}

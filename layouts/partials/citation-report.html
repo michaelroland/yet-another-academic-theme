@@ -14,10 +14,11 @@ Context: The current publication data context.
 */ -}}
 {{- partial "citation-include-author-eds-org-title" . -}}
 {{- $report_types := slice -}}
-{{- $report_types := $report_types | append (dict "type" "tech" "title" (T "technical_report")) -}}
-{{- $report_types := $report_types | append (dict "type" "bug"  "title" (T "bug_report")) -}}
-{{- $report_types := $report_types | append (dict "type" "eval" "title" (T "evaluation_report")) -}}
-{{- $report_types := $report_types | append (dict "type" "vuln" "title" (T "vulnerability_report")) -}}
+{{- $report_types := $report_types | append (dict "type" "tech"     "title" (T "technical_report")) -}}
+{{- $report_types := $report_types | append (dict "type" "bug"      "title" (T "bug_report")) -}}
+{{- $report_types := $report_types | append (dict "type" "eval"     "title" (T "evaluation_report")) -}}
+{{- $report_types := $report_types | append (dict "type" "vuln"     "title" (T "vulnerability_report")) -}}
+{{- $report_types := $report_types | append (dict "type" "preprint" "title" (T "preprint")) -}}
 {{- $report_type := index (index $report_types 0) "title" -}}
 {{- with .report_type -}}
     {{- $report_type = . | markdownify -}}
