@@ -195,6 +195,9 @@ other = "Ph.D. thesis"
 [posted_on]
 other = "Posted on"
 
+[preprint]
+other = "Preprint"
+
 [presented_by]
 other = ", by"
 
