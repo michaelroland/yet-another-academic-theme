@@ -47,15 +47,17 @@ Return: An author structure that consists of
         {{- end -}}
     {{- end -}}
     {{- $initials := slice -}}
-    {{- range split $firstname " " -}}
-        {{- if in . "-" -}}
-            {{- $namepart := slice -}}
-            {{- range split . "-" -}}
-                {{- $namepart = $namepart | append (printf "%s." (substr . 0 1)) -}}
+    {{- with $firstname -}}
+        {{- range split . " " -}}
+            {{- if in . "-" -}}
+                {{- $namepart := slice -}}
+                {{- range split . "-" -}}
+                    {{- $namepart = $namepart | append (printf "%s." (substr . 0 1)) -}}
+                {{- end -}}
+                {{- $initials = $initials | append (delimit $namepart "-") -}}
+            {{- else -}}
+                {{- $initials = $initials | append (printf "%s." (substr . 0 1)) -}}
             {{- end -}}
-            {{- $initials = $initials | append (delimit $namepart "-") -}}
-        {{- else -}}
-            {{- $initials = $initials | append (printf "%s." (substr . 0 1)) -}}
         {{- end -}}
     {{- end -}}
     {{- $firstinitials := delimit $initials " " -}}
