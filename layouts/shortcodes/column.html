@@ -12,6 +12,7 @@ Shortcode: Print a column in a side-by-side multi-column environment.
 Note: This shortcode expects an ".Inner" body and, therefore, needs to be closed.
 
 Param 0: colspan  This column takes the space of N columns (defaults to 1).
+Param 1...:       Optionally repeat param 0 for each additional breakpoint of the columns environment to modify the colspan.
 Inner: Contents of the column.
 
 */ -}}
@@ -36,8 +37,8 @@ Inner: Contents of the column.
 {{- if or (gt $columns 12) (lt $columns 1) -}}
     {{- errorf "%s: Number of columns must be in range 1..12 (but is %d) in shortcode %q" $.Parent.Position $columns $.Parent.Name -}}
 {{- end -}}
-{{- $colspan := int ((.Get (cond .IsNamedParams "colspan" 0)) | default 1) -}}
-{{- $colspan = mul (div 12 $columns) $colspan -}}
+{{- $colspan_base := int ((.Get (cond .IsNamedParams "colspan" 0)) | default 1) -}}
+{{- $colspan := mul (div 12 $columns) $colspan_base -}}
 {{- $remainder := sub 12 (mul $columns $colspan) -}}
 {{- $last_columns := 12 -}}
 {{- $.Page.Scratch.Add "shortcode_columns_column_count" (sub $colspan 1) -}}
@@ -53,7 +54,8 @@ Inner: Contents of the column.
             {{- if gt $columns $last_columns -}}
                 {{- errorf "%s: Number of columns must be less or equal to previous breakpoint in argument %d (%d > %d) in shortcode %q" $.Parent.Position $index $columns $last_columns $.Parent.Name -}}
             {{- end -}}
-            {{- $colspan = div 12 $columns -}}
+            {{- $colspan_base = cond (not $.IsNamedParams) ($.Get (div $index 2) | default $colspan_base) $colspan_base -}}
+            {{- $colspan = mul (div 12 $columns) $colspan_base -}}
             {{- $remainder = sub 12 (mul $columns $colspan) -}}
         {{- else -}}
             {{- $breakpoint := "" -}}
@@ -65,8 +67,6 @@ Inner: Contents of the column.
             {{- else -}}
                 {{- $column_class = printf "col%s-%d %s" $breakpoint $colspan $column_class -}}
             {{- end -}}
-            {{- $colspan = 12 -}}
-            {{- $remainder = 0 -}}
             {{- $last_columns = $columns -}}
         {{- end -}}
     {{- end -}}
