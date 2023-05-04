@@ -122,7 +122,7 @@ Param: AllowUrlAttrs    If true, allow target, rel, and class attributes as pref
 {{- if hasPrefix $url "pub:" -}}
     {{- $publications_bundle_current_lang := site.GetPage (printf "/%s" site.Data.theme.config.publications_bundle) -}}
     {{- $publications_bundle_default_lang := site.Sites.First.GetPage (printf "/%s" site.Data.theme.config.publications_bundle) -}}
-    {{- $publications := $publications_bundle_current_lang.Pages | lang.Merge $publications_bundle_default_lang.Pages -}}
+    {{- $publications := $publications_bundle_current_lang.Pages | lang.Merge $publications_bundle_default_lang.Pages | default slice -}}
     {{- $publications = where $publications "File.ContentBaseName" "==" (strings.TrimPrefix "pub:" $url) -}}
     {{- $pub := false -}}
     {{- if gt (len $publications) 0 -}}
@@ -152,7 +152,7 @@ Param: AllowUrlAttrs    If true, allow target, rel, and class attributes as pref
     {{- else -}}
         {{- $publications_bundle_current_lang := site.GetPage (printf "/%s" site.Data.theme.config.publications_bundle) -}}
         {{- $publications_bundle_default_lang := site.Sites.First.GetPage (printf "/%s" site.Data.theme.config.publications_bundle) -}}
-        {{- $publications := $publications_bundle_current_lang.Pages | lang.Merge $publications_bundle_default_lang.Pages -}}
+        {{- $publications := $publications_bundle_current_lang.Pages | lang.Merge $publications_bundle_default_lang.Pages | default slice -}}
         {{- $publications = where $publications "File.ContentBaseName" "==" (strings.TrimPrefix "talk:" $url) -}}
         {{- if gt (len $publications) 0 -}}
             {{- $pub := index $publications 0 -}}

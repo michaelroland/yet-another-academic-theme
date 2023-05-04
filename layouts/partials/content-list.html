@@ -12,7 +12,7 @@ Partial: Render paginated bundle content preview list.
 Context: The current content meta context of a bundle.
 
 */ -}}
-{{- $posts := $.Page.Pages | lang.Merge (index $.Page.AllTranslations 0).Pages -}}
+{{- $posts := $.Page.Pages | lang.Merge (index $.Page.AllTranslations 0).Pages | default slice -}}
 {{- $posts = where $posts "Params.hidden" "!=" true -}}
 
 {{- with $.Page.Param "list.sort" -}}

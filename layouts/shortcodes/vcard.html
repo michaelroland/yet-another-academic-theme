@@ -60,7 +60,7 @@ Page-level Params:
 */ -}}
 {{- $people_bundle_current_lang := site.GetPage (printf "/%s" site.Data.theme.config.people_bundle) -}}
 {{- $people_bundle_default_lang := site.Sites.First.GetPage (printf "/%s" site.Data.theme.config.people_bundle) -}}
-{{- $people := $people_bundle_current_lang.Pages | lang.Merge $people_bundle_default_lang.Pages -}}
+{{- $people := $people_bundle_current_lang.Pages | lang.Merge $people_bundle_default_lang.Pages | default slice -}}
 {{- $people = where $people "Params.hidden" "!=" true -}}
 
 {{- $people_merged := slice -}}

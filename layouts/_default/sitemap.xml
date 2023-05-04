@@ -8,7 +8,8 @@
 {{ printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?>" | safeHTML }}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
-{{- $pages := where .Data.Pages ".Params.hidden" "!=" true -}}
+{{- $pages := .Data.Pages | default slice -}}
+{{- $pages = where $pages ".Params.hidden" "!=" true -}}
 {{- range $pages }}
   {{- $pagedata := partial "function-content-meta" (dict "Page" . "Params" .Params) -}}
   {{- if and $pagedata.is_regular_page (not $pagedata.is_referal_page) $pagedata.has_content }}

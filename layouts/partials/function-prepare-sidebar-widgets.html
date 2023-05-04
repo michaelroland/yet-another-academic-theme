@@ -27,7 +27,7 @@ Return: A sidebar widgets structure that consists of
     {{- $page_url = trim $page_url "/" -}}
     {{- $sidebar_bundle_current_lang := site.GetPage (printf "/%s" site.Data.theme.config.sidebar_widgets_bundle) -}}
     {{- $sidebar_bundle_default_lang := site.Sites.First.GetPage (printf "/%s" site.Data.theme.config.sidebar_widgets_bundle) -}}
-    {{- $sidebar_bundle := $sidebar_bundle_current_lang.Pages | lang.Merge $sidebar_bundle_default_lang.Pages -}}
+    {{- $sidebar_bundle := $sidebar_bundle_current_lang.Pages | lang.Merge $sidebar_bundle_default_lang.Pages | default slice -}}
     {{- range $sidebar := where $sidebar_bundle "Params.hidden" "!=" true -}}
         {{- if not (in $sidebar.Params.hideOn $page_url) -}}
             {{- $sidebar_widgets = $sidebar_widgets | append $sidebar -}}

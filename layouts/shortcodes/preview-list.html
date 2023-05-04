@@ -41,7 +41,7 @@ Page-level Params:
         {{- $bundle_name := printf "/%s" . -}}
         {{- $bundle_current_lang := site.GetPage $bundle_name -}}
         {{- $bundle_default_lang := site.Sites.First.GetPage $bundle_name -}}
-        {{- $bundle_posts := $bundle_current_lang.Pages | lang.Merge $bundle_default_lang.Pages -}}
+        {{- $bundle_posts := $bundle_current_lang.Pages | lang.Merge $bundle_default_lang.Pages | default slice -}}
         {{- $bundle_posts = where $bundle_posts "Params.hidden" "!=" true -}}
         {{- $posts = $posts | append $bundle_posts -}}
     {{- end -}}

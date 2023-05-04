@@ -49,7 +49,7 @@ Page-level Params:
 */ -}}
 {{- $publications_bundle_current_lang := site.GetPage (printf "/%s" site.Data.theme.config.publications_bundle) -}}
 {{- $publications_bundle_default_lang := site.Sites.First.GetPage (printf "/%s" site.Data.theme.config.publications_bundle) -}}
-{{- $publications := $publications_bundle_current_lang.Pages | lang.Merge $publications_bundle_default_lang.Pages -}}
+{{- $publications := $publications_bundle_current_lang.Pages | lang.Merge $publications_bundle_default_lang.Pages | default slice -}}
 {{- $publications = where $publications "Params.hidden" "!=" true -}}
 
 {{- $publications_merged := slice -}}
