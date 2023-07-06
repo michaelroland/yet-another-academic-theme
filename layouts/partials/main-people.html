@@ -15,7 +15,7 @@ Context: The current page context.
 {{- $pagedata := partial "function-content-meta" (dict "Page" .Page "Params" .Params) -}}
 {{- $sidebarwidgets := partial "function-prepare-sidebar-widgets" (dict "Page" .Page "Params" .Params) -}}
 
-<main id="main" class="container-fluid {{ $.Type }} {{ $.Kind }} {{ $.Type }}-{{ with $pagedata.uniqueid }}{{ . }}{{ else }}none{{ end }}">
+<main id="main" class="container-fluid {{ $.Type }} {{ $.Kind }} {{ $.Type }}-{{ with $pagedata.uniquekey }}{{ . }}{{ else }}none{{ end }}">
     {{- partial "content-featured" $pagedata -}}
     <div class="container container-fluid-lg">
         {{- partial "breadcrumb-trail" . -}}
