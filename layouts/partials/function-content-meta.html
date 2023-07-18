@@ -209,12 +209,18 @@ Return: A content metadata structure that consists of
 {{- $is_regular_page = not $permalink.is_referal_page | and $is_regular_page -}}
 
 {{- $preview_icon := "" -}}
+{{- $preview_icon_width := 0 -}}
+{{- $preview_icon_height := 0 -}}
+{{- $preview_icon_alt := "" -}}
 {{- $preview_invert := false -}}
 {{- with .Page -}}
     {{- with .Param "preview_icon" -}}
         {{- $preview_icon = . -}}
     {{- end -}}
     {{- if $preview_icon -}}
+        {{- $preview_icon_width  = .Param "preview_icon_width"  | default $preview_icon_width  -}}
+        {{- $preview_icon_height = .Param "preview_icon_height" | default $preview_icon_height -}}
+        {{- $preview_icon_alt    = .Param "preview_icon_alt"    | default $preview_icon_alt    -}}
         {{- $preview_icon_url := $preview_icon | relURL -}}
         {{- $parent := . -}}
         {{- range .Site.Pages -}}{{- /* hack: loop sufficiently long to iterate over all parents; interrupt with `break` */ -}}
@@ -224,6 +230,9 @@ Return: A content metadata structure that consists of
                 {{- end -}}
                 {{- with .Resources.GetMatch $preview_icon -}}
                     {{- $preview_icon_url = .RelPermalink -}}
+                    {{- $preview_icon_width  = $preview_icon_width  | default .Width  -}}
+                    {{- $preview_icon_height = $preview_icon_height | default .Height -}}
+                    {{- $preview_icon_alt    = $preview_icon_alt    | default .Title  -}}
                 {{- end -}}
             {{- else -}}
                 {{- break -}}
@@ -236,10 +245,16 @@ Return: A content metadata structure that consists of
 {{- with .Params -}}
     {{- with .preview_icon -}}
         {{- $preview_icon = . -}}
-        {{- $preview_icon_url := . | relURL -}}
+        {{- $preview_icon_width  = index $.Params "preview_icon_width"  | default 0 -}}
+        {{- $preview_icon_height = index $.Params "preview_icon_height" | default 0 -}}
+        {{- $preview_icon_alt    = index $.Params "preview_icon_alt"    | default "" -}}
+        {{- $preview_icon_url := $preview_icon | relURL -}}
         {{- with $.Page -}}
             {{- with .Resources.GetMatch $preview_icon -}}
                 {{- $preview_icon_url = .RelPermalink -}}
+                {{- $preview_icon_width  = $preview_icon_width  | default .Width  -}}
+                {{- $preview_icon_height = $preview_icon_height | default .Height -}}
+                {{- $preview_icon_alt    = $preview_icon_alt    | default .Title  -}}
             {{- end -}}
         {{- end -}}
         {{- $preview_icon = $preview_icon_url -}}
@@ -259,5 +274,5 @@ Return: A content metadata structure that consists of
 {{- $result = merge $result (dict "is_regular_page" $is_regular_page "is_referal_page" $permalink.is_referal_page) -}}
 {{- $result = merge $result (dict "is_special_bundle" $is_special_bundle "is_in_special_bundle" $is_in_special_bundle "special_bundle" $special_bundle) -}}
 {{- $result = merge $result (dict "permalink" $permalink.permalink) -}}
-{{- $result = merge $result (dict "preview_icon" $preview_icon "preview_invert" $preview_invert) -}}
+{{- $result = merge $result (dict "preview_icon" $preview_icon "preview_icon_width" $preview_icon_width "preview_icon_height" $preview_icon_height "preview_icon_alt" $preview_icon_alt "preview_invert" $preview_invert) -}}
 {{- return $result -}}
