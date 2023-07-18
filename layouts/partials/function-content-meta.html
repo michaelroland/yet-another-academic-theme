@@ -42,6 +42,8 @@ Return: A content metadata structure that consists of
 {{- $authors := dict -}}
 {{- with .Params -}}
     {{- $authors = partial "function-process-authors" (dict "Authors" .author) -}}
+{{- else -}}
+    {{- $authors = partial "function-process-authors" (dict "Authors" slice) -}}
 {{- end -}}
 
 {{- $author_links := false -}}
