@@ -50,7 +50,7 @@ Context: The current page context.
     {{- end }}
 {{- end }}
 {{- with $pagedata.abstract }}
-<meta property="og:description" {{ . | truncate 140 "..." | htmlEscape | printf "content=%q" | safeHTMLAttr }} />
+<meta property="og:description" {{ . | plainify | safeHTML | truncate 140 "..." | printf "content=%q" | safeHTMLAttr }} />
 {{- end }}
 
 {{- if eq $pagetype "article" -}}
