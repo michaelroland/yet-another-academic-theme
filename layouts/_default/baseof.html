@@ -16,7 +16,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<title>{{ block "title" . }}{{- if not .IsHome }}{{ .LinkTitle }} &ndash; {{ end }}{{ .Site.Title -}}{{ end }}</title>
+<title>{{ block "title" . }}{{- if or (not .IsHome) (.Param "add_title") }}{{ .LinkTitle }} &ndash; {{ end }}{{ .Site.Title -}}{{ end }}</title>
 
 {{- block "meta" . }}
 {{ end }}
@@ -26,9 +26,9 @@
 {{- block "feeds" . }}
 {{ end }}
 {{ if .IsTranslated -}}
-<link rel="alternate" hreflang="{{ .Site.LanguageCode | default .Lang }}" href="{{ .Permalink }}" title="{{ cond .IsHome .Site.Title .LinkTitle | htmlEscape }}" />
+<link rel="alternate" {{ .Site.LanguageCode | default .Lang | printf "hreflang=%q" | safeHTMLAttr }} {{ .Permalink | printf "href=%q" | safeHTMLAttr }} {{ cond .IsHome (cond (.Param "add_title") (printf "%s &ndash; %s" (.LinkTitle | htmlEscape) (.Site.Title | htmlEscape)) (.Site.Title| htmlEscape)) (.LinkTitle | htmlEscape) | printf "title=%q" | safeHTMLAttr }} />
     {{- range .Translations }}
-<link rel="alternate" hreflang="{{ .Site.LanguageCode | default .Lang }}" href="{{ .Permalink }}" title="{{ cond .IsHome .Site.Title .LinkTitle | htmlEscape }}" />
+<link rel="alternate" {{ .Site.LanguageCode | default .Lang | printf "hreflang=%q" | safeHTMLAttr }} {{ .Permalink | printf "href=%q" | safeHTMLAttr }} {{ cond .IsHome (cond (.Param "add_title") (printf "%s &ndash; %s" (.LinkTitle | htmlEscape) (.Site.Title | htmlEscape)) (.Site.Title| htmlEscape)) (.LinkTitle | htmlEscape) | printf "title=%q" | safeHTMLAttr }} />
     {{- end -}}
 {{- end -}}
 

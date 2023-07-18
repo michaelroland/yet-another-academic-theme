@@ -18,7 +18,7 @@ Context: The current page context.
     <meta http-equiv="refresh" {{ $pagedata.permalink | printf "0;URL=%s" | printf "content=%q" | safeHTMLAttr }} />
 {{- end }}
 
-<meta property="og:title" content="{{- if not .IsHome -}}{{ .LinkTitle }}{{- else -}}{{ .Site.Title }}{{- end -}}" />
+<meta property="og:title" {{ cond .IsHome (cond (.Param "add_title") (printf "%s &ndash; %s" (.LinkTitle | htmlEscape) (.Site.Title | htmlEscape)) (.Site.Title| htmlEscape)) (.LinkTitle | htmlEscape) | printf "content=%q" | safeHTMLAttr }} />
 {{- if not .IsHome }}
 <meta property="og:site_name" content="{{ .Site.Title }}" />
 {{- end }}
@@ -31,26 +31,26 @@ Context: The current page context.
 {{- else if $pagedata.authors.count -}}
     {{- $pagetype = "article" -}}
 {{- end }}
-<meta property="og:type" content="{{ $pagetype }}" />
-<meta property="og:locale" content="{{ replace (.Site.LanguageCode | default .Lang) "-" "_" }}" />
+<meta property="og:type" {{ $pagetype | printf "content=%q" | safeHTMLAttr }} />
+<meta property="og:locale" {{ replace (.Site.LanguageCode | default .Lang) "-" "_" | printf "content=%q" | safeHTMLAttr }} />
 {{- if .IsTranslated -}}{{- range .Translations }}
-<meta property="og:locale:alternate" content="{{ replace (.Site.LanguageCode | default .Lang) "-" "_" }}" />
+<meta property="og:locale:alternate" {{ replace (.Site.LanguageCode | default .Lang) "-" "_" | printf "content=%q" | safeHTMLAttr }} />
 {{- end -}}{{- end }}
-<meta property="og:url" content="{{ $pagedata.permalink | absURL }}" />
+<meta property="og:url" {{ $pagedata.permalink | absURL | printf "content=%q" | safeHTMLAttr }} />
 {{- with $pagedata.preview_icon }}
-<meta property="og:image" content="{{ . | absURL }}" />
+<meta property="og:image" {{ . | absURL | printf "content=%q" | safeHTMLAttr }} />
     {{- with $pagedata.preview_icon_width }}
-<meta property="og:image:width" content="{{ . }}" />
+<meta property="og:image:width" {{ . | printf "content=%q" | safeHTMLAttr }} />
     {{- end }}
     {{- with $pagedata.preview_icon_height }}
-<meta property="og:image:height" content="{{ . }}" />
+<meta property="og:image:height" {{ . | printf "content=%q" | safeHTMLAttr }} />
     {{- end }}
     {{- with $pagedata.preview_icon_alt }}
-<meta property="og:image:alt" content="{{ . }}" />
+<meta property="og:image:alt" {{ . | printf "content=%q" | safeHTMLAttr }} />
     {{- end }}
 {{- end }}
 {{- with $pagedata.abstract }}
-<meta property="og:description" content="{{ . | truncate 140 "..." }}" />
+<meta property="og:description" {{ . | truncate 140 "..." | htmlEscape | printf "content=%q" | safeHTMLAttr }} />
 {{- end }}
 
 {{- if eq $pagetype "article" -}}
@@ -66,14 +66,14 @@ Context: The current page context.
     {{- if $pagedata.display_authors }}
         {{- range $pagedata.authors.objects -}}
             {{- with .page }}
-    <meta property="article:author" content="{{ .Permalink }}" />
+    <meta property="article:author" {{ .Permalink | printf "content=%q" | safeHTMLAttr }} />
             {{- end -}}
         {{- end -}}
     {{- end -}}
 {{- else if eq $pagetype "profile" -}}
     {{- $profile := partial "function-process-authors" (dict "Authors" .Params.name) -}}
     {{- if $profile.count }}
-<meta property="profile:first_name" content="{{ (index $profile.objects 0).firstname }}" />
-<meta property="profile:last_name" content="{{ (index $profile.objects 0).lastname }}" />
+<meta property="profile:first_name" {{ (index $profile.objects 0).firstname | htmlEscape | printf "content=%q" | safeHTMLAttr }} />
+<meta property="profile:last_name" {{ (index $profile.objects 0).lastname | htmlEscape | printf "content=%q" | safeHTMLAttr }} />
     {{- end -}}
 {{- end -}}

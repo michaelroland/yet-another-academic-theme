@@ -10,7 +10,7 @@
 
 {{ define "feeds" }}
 {{ range .AlternativeOutputFormats -}}
-    <link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .RelPermalink }}" title="{{ cond $.IsHome $.Site.Title $.LinkTitle | htmlEscape }}" />
+    <link {{ .Rel | printf "rel=%q" | safeHTMLAttr }} {{ .MediaType.Type | printf "type=%q" | safeHTMLAttr }} {{ .RelPermalink | printf "href=%q" | safeHTMLAttr }} {{ cond $.IsHome (cond ($.Param "add_title") (printf "%s &ndash; %s" ($.LinkTitle | htmlEscape) ($.Site.Title | htmlEscape)) ($.Site.Title| htmlEscape)) ($.LinkTitle | htmlEscape) | printf "title=%q" | safeHTMLAttr }} />
 {{- end }}
 {{ end }}
 
