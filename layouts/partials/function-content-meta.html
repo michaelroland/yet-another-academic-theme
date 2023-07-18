@@ -210,6 +210,29 @@ Return: A content metadata structure that consists of
 
 {{- $preview_icon := "" -}}
 {{- $preview_invert := false -}}
+{{- with .Page -}}
+    {{- with .Param "preview_icon" -}}
+        {{- $preview_icon = . -}}
+    {{- end -}}
+    {{- if $preview_icon -}}
+        {{- $preview_icon_url := $preview_icon | relURL -}}
+        {{- $parent := . -}}
+        {{- range .Site.Pages -}}{{- /* hack: loop sufficiently long to iterate over all parents; interrupt with `break` */ -}}
+            {{- with $parent -}}
+                {{- with .Parent -}}
+                    {{- $parent = . -}}
+                {{- end -}}
+                {{- with .Resources.GetMatch $preview_icon -}}
+                    {{- $preview_icon_url = .RelPermalink -}}
+                {{- end -}}
+            {{- else -}}
+                {{- break -}}
+            {{- end -}}
+        {{- end -}}
+        {{- $preview_icon = $preview_icon_url -}}
+    {{- end -}}
+    {{- $preview_invert = .Param "preview_invert" | default $preview_invert -}}
+{{- end -}}
 {{- with .Params -}}
     {{- with .preview_icon -}}
         {{- $preview_icon = . -}}

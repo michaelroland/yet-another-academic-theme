@@ -1,13 +1,12 @@
-{{ define "title" }}
+{{ define "meta" }}
 {{- /*
-******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  Copyright (c) 2019-2023 Michael Roland <mi.roland@gmail.com>
 ******  
 ******  This Source Code Form is subject to the terms of the Mozilla Public
 ******  License, v. 2.0. If a copy of the MPL was not distributed with this
 ******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */ -}}
-{{- if not .IsHome }}{{ .LinkTitle }} &ndash; {{ end }}{{ .Site.Title -}}
-{{ end }}
+{{ partial "meta" . }}{{ end }}
 
 {{ define "header" }}{{ partial "header" . }}{{ end }}
 

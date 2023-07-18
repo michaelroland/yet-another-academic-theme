@@ -9,6 +9,8 @@
 {{- if not .IsHome }}{{ .LinkTitle }} &ndash; {{ end }}{{ .Site.Title -}}
 {{ end }}
 
+{{ define "meta" }}{{ partial "meta" . }}{{ end }}
+
 {{ define "header" }}{{ partial "header" . }}{{ end }}
 
 {{ define "main" }}{{ partial "main-people" . }}{{ end }}

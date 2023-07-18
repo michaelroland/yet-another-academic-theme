@@ -6,21 +6,20 @@
 ******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */ -}}
 <!DOCTYPE html>
-<html lang="{{ .Site.LanguageCode | default .Site.Language.Lang }}">
+<html lang="{{ .Site.LanguageCode | default .Site.Language.Lang }}" prefix="{{ range $k,$v := site.Data.theme.config.html_prefix_ns }}{{ printf "%s%s: %s" (cond (ne $k 0) " " "") $v.prefix $v.ns_uri }}{{ end }}">
 <head>
 {{- with .GitInfo }}
     {{ printf "<!-- Built on %s from version %s@%s -->" (now.UTC.Format "2006-01-02T15:04:05Z07:00") .AbbreviatedHash (.AuthorDate.UTC.Format "2006-01-02T15:04:05Z07:00") | safeHTML }}
 {{- else }}
     {{ printf "<!-- Built on %s -->" (now.UTC.Format "2006-01-02T15:04:05Z07:00") | safeHTML }}
 {{- end }}
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-{{- with .Params -}}{{- with .target }}
-    {{ printf "<meta http-equiv=%q content=%q>" "refresh" (printf "0;URL=%s" .) | safeHTML }}
-{{- end -}}{{- end }}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<title>{{ block "title" . }}{{ .Site.Title }}{{ end }}</title>
+<title>{{ block "title" . }}{{- if not .IsHome }}{{ .LinkTitle }} &ndash; {{ end }}{{ .Site.Title -}}{{ end }}</title>
 
+{{- block "meta" . }}
+{{ end }}
 {{ partial "site-header.html" . }}
 {{ partial "favicon.html" . }}
 

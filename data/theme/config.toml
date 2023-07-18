@@ -1,6 +1,6 @@
 ## Theme configuration: General
 ## 
-##  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+##  Copyright (c) 2019-2023 Michael Roland <mi.roland@gmail.com>
 ##  
 ##  This Source Code Form is subject to the terms of the Mozilla Public
 ##  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -20,3 +20,23 @@ people_bundle = "people"
 publications_bundle = "publications"
 talks_bundle = "talks"
 teaching_bundle = "teaching"
+
+[[html_prefix_ns]]
+  prefix = "og"
+  ns_uri = "http://ogp.me/ns#"
+
+[[html_prefix_ns]]
+  prefix = "website"
+  ns_uri = "http://ogp.me/ns/website#"
+
+[[html_prefix_ns]]
+  prefix = "article"
+  ns_uri = "http://ogp.me/ns/article#"
+
+[[html_prefix_ns]]
+  prefix = "profile"
+  ns_uri = "http://ogp.me/ns/profile#"
+
+[[html_prefix_ns]]
+  prefix = "video"
+  ns_uri = "http://ogp.me/ns/video#"

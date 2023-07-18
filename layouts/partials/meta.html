@@ -1,0 +1,70 @@
+{{- /*
+******  Copyright (c) 2023 Michael Roland <mi.roland@gmail.com>
+******  
+******  This Source Code Form is subject to the terms of the Mozilla Public
+******  License, v. 2.0. If a copy of the MPL was not distributed with this
+******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
+*/ -}}
+{{- /*
+
+Partial: Render page-specific HTML header elements.
+
+Context: The current page context.
+
+*/ -}}
+{{- $pagedata := partial "function-content-meta" (dict "Page" .Page "Params" .Params) -}}
+
+{{- if $pagedata.is_referal_page -}}
+    <meta http-equiv="refresh" {{ $pagedata.permalink | printf "0;URL=%s" | printf "content=%q" | safeHTMLAttr }} />
+{{- end }}
+
+<meta property="og:title" content="{{- if not .IsHome -}}{{ .LinkTitle }}{{- else -}}{{ .Site.Title }}{{- end -}}" />
+{{- if not .IsHome }}
+<meta property="og:site_name" content="{{ .Site.Title }}" />
+{{- end }}
+{{- $pagetype := "website" -}}
+{{- if $pagedata.is_special_bundle -}}
+{{- else if $pagedata.is_in_special_bundle -}}
+    {{- if eq $pagedata.special_bundle site.Data.theme.config.people_bundle -}}
+        {{- $pagetype = "profile" -}}
+    {{- end -}}
+{{- else if $pagedata.authors.count -}}
+    {{- $pagetype = "article" -}}
+{{- end }}
+<meta property="og:type" content="{{ $pagetype }}" />
+<meta property="og:locale" content="{{ replace (.Site.LanguageCode | default .Lang) "-" "_" }}" />
+{{- if .IsTranslated -}}{{- range .Translations }}
+<meta property="og:locale:alternate" content="{{ replace (.Site.LanguageCode | default .Lang) "-" "_" }}" />
+{{- end -}}{{- end }}
+<meta property="og:url" content="{{ $pagedata.permalink | absURL }}" />
+{{- with $pagedata.preview_icon }}
+<meta property="og:image" content="{{ $pagedata.preview_icon | absURL }}" />
+{{- end }}
+{{- with $pagedata.abstract }}
+<meta property="og:description" content="{{ . | truncate 140 "..." }}" />
+{{- end }}
+
+{{- if eq $pagetype "article" -}}
+    {{- $iso8601 := "2006-01-02T15:04:05-07:00" -}}
+    {{- if $pagedata.display_date }}
+        {{- with $pagedata.date }}
+    <meta property="article:published_time" {{ .date.Format $iso8601 | printf "content=%q" | safeHTMLAttr }} />
+        {{- end -}}
+        {{- with $pagedata.moddate }}
+    <meta property="article:modified_time" {{ .date.Format $iso8601 | printf "content=%q" | safeHTMLAttr }} />
+        {{- end -}}
+    {{- end -}}
+    {{- if $pagedata.display_authors }}
+        {{- range $pagedata.authors.objects -}}
+            {{- with .page }}
+    <meta property="article:author" content="{{ .Permalink }}" />
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+{{- else if eq $pagetype "profile" -}}
+    {{- $profile := partial "function-process-authors" (dict "Authors" .Params.name) -}}
+    {{- if $profile.count }}
+<meta property="profile:first_name" content="{{ (index $profile.objects 0).firstname }}" />
+<meta property="profile:last_name" content="{{ (index $profile.objects 0).lastname }}" />
+    {{- end -}}
+{{- end -}}
