@@ -1,5 +1,5 @@
 {{- /*
-******  Copyright (c) 2019-2021 Michael Roland <mi.roland@gmail.com>
+******  Copyright (c) 2019-2023 Michael Roland <mi.roland@gmail.com>
 ******  
 ******  This Source Code Form is subject to the terms of the Mozilla Public
 ******  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,12 +12,9 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   {{- $pages := .Site.Pages | default slice -}}
   {{- $pages := where $pages ".Params.hidden" "!=" true -}}
-  {{- $pages = union (where $pages ".Type" "not in" site.Data.theme.config.special_page_types) (where $pages ".Kind" "section") -}}
   {{- $pages = sort $pages "Title" "asc" -}}
   {{- $pages = sort $pages "Params.date" "desc" -}}
-  {{- if ge $limit 1 -}}
-    {{- $pages = $pages | first $limit -}}
-  {{- end }}
+  {{- $pages = sort $pages "Params.lastmod" "desc" -}}
   <channel>
     <title>{{ .Site.Title }}</title>
     <link>{{ .Permalink }}</link>
@@ -34,7 +31,12 @@
   {{- end }}
   {{- range $pages }}
     {{- $pagedata := partial "function-content-meta" (dict "Page" . "Params" .Params) -}}
-    {{- if and $pagedata.is_regular_page (not $pagedata.is_referal_page) $pagedata.has_content }}
+    {{- if $pagedata.is_regular_page -}}
+      {{- if ge $limit 1 -}}
+        {{- $limit = sub $limit 1 -}}
+      {{- else if eq $limit 0 -}}
+        {{- break -}}
+      {{- end }}
     <item>
       <title>{{ .Title }}</title>
       <link>{{ .Permalink }}</link>

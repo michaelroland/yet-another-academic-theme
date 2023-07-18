@@ -34,6 +34,8 @@ Return: A content metadata structure that consists of
     .is_regular_page    
     .is_referal_page    
     .is_special_bundle  
+    .is_in_special_bundle  
+    .special_bundle     
     .permalink          
     .preview_icon       
     .preview_invert     
@@ -103,17 +105,34 @@ Return: A content metadata structure that consists of
 {{- $uniquekey := "" -}}
 {{- $is_regular_page := false -}}
 {{- $is_special_bundle := false -}}
+{{- $is_in_special_bundle := false -}}
+{{- $special_bundle := "" -}}
 {{- with .Page -}}
     {{- with .File -}}
         {{- $key = .ContentBaseName -}}
         {{- $uniquekey = .UniqueID -}}
     {{- end -}}
-    {{- with .Type -}}
-        {{- $is_special_bundle = in site.Data.theme.config.special_page_types . -}}
-        {{- $is_regular_page = not $is_special_bundle -}}
-    {{- end -}}
-    {{- with .Kind -}}
-        {{- $is_regular_page = $is_regular_page | or (eq . "section") -}}
+    {{- if .IsSection -}}
+        {{- with .Type -}}
+            {{- $is_special_bundle = in site.Data.theme.config.special_page_types . -}}
+            {{- if $is_special_bundle -}}
+                {{- $special_bundle = . -}}
+            {{- end -}}
+        {{- end -}}
+        {{- $is_regular_page = true -}}
+    {{- else if .IsPage -}}
+        {{- $is_regular_page = eq .Type .Kind -}}
+        {{- with .Section -}}
+            {{- $is_in_special_bundle = in site.Data.theme.config.special_page_types . -}}
+            {{- if $is_in_special_bundle -}}
+                {{- $special_bundle = . -}}
+            {{- end -}}
+        {{- end -}}
+        {{- if not $is_in_special_bundle -}}
+            {{- $is_regular_page = true -}}
+        {{- end -}}
+    {{- else if .IsHome -}}
+        {{- $is_regular_page = true -}}
     {{- end -}}
 {{- end -}}
 
@@ -183,8 +202,11 @@ Return: A content metadata structure that consists of
         {{- end -}}
     {{- end -}}
 {{- end -}}
+{{- $has_content := or (gt (len $abstract) 0) (gt (len $features) 0) (gt (len $main_content) 0) (gt (len $supplementary_content) 0) -}}
+{{- $is_regular_page = $is_regular_page | and $has_content -}}
 
 {{- $permalink := partial "function-content-permalink" (dict "Page" .Page "Params" .Params) -}}
+{{- $is_regular_page = not $permalink.is_referal_page | and $is_regular_page -}}
 
 {{- $preview_icon := "" -}}
 {{- $preview_invert := false -}}
@@ -209,9 +231,10 @@ Return: A content metadata structure that consists of
 {{- $result = merge $result (dict "date" $date "moddate" $moddate) -}}
 {{- $result = merge $result (dict "display_authors" $display_authors "display_date" $display_date) -}}
 {{- $result = merge $result (dict "key" $key "uniquekey" $uniquekey) -}}
-{{- $result = merge $result (dict "has_content" (or (gt (len $abstract) 0) (gt (len $features) 0) (gt (len $main_content) 0) (gt (len $supplementary_content) 0))) -}}
+{{- $result = merge $result (dict "has_content" $has_content) -}}
 {{- $result = merge $result (dict "abstract" $abstract "features" $features "main" $main_content "supplementary" $supplementary_content) -}}
-{{- $result = merge $result (dict "is_regular_page" $is_regular_page "is_referal_page" $permalink.is_referal_page "is_special_bundle" $is_special_bundle) -}}
+{{- $result = merge $result (dict "is_regular_page" $is_regular_page "is_referal_page" $permalink.is_referal_page) -}}
+{{- $result = merge $result (dict "is_special_bundle" $is_special_bundle "is_in_special_bundle" $is_in_special_bundle "special_bundle" $special_bundle) -}}
 {{- $result = merge $result (dict "permalink" $permalink.permalink) -}}
 {{- $result = merge $result (dict "preview_icon" $preview_icon "preview_invert" $preview_invert) -}}
 {{- return $result -}}
