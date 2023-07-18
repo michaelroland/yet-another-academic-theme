@@ -24,8 +24,7 @@
 {{ partial "site-header.html" . }}
 {{ partial "favicon.html" . }}
 
-{{- range .AlternativeOutputFormats }}
-    {{ printf "<link rel=%q type=%q href=%q title=%q />" .Rel .MediaType.Type .RelPermalink $.Site.Title | safeHTML }}
+{{- block "feeds" . }}
 {{ end }}
 {{ if .IsTranslated -}}
 <link rel="alternate" hreflang="{{ .Site.LanguageCode | default .Lang }}" href="{{ .Permalink }}" title="{{ cond .IsHome .Site.Title .LinkTitle | htmlEscape }}" />
