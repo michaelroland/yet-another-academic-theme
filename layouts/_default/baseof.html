@@ -6,7 +6,7 @@
 ******  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 */ -}}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ .Site.LanguageCode | default .Site.Language.Lang }}">
 <head>
 {{- with .GitInfo }}
     {{ printf "<!-- Built on %s from version %s@%s -->" (now.UTC.Format "2006-01-02T15:04:05Z07:00") .AbbreviatedHash (.AuthorDate.UTC.Format "2006-01-02T15:04:05Z07:00") | safeHTML }}
@@ -26,6 +26,12 @@
 
 {{- range .AlternativeOutputFormats }}
     {{ printf "<link rel=%q type=%q href=%q title=%q />" .Rel .MediaType.Type .RelPermalink $.Site.Title | safeHTML }}
+{{ end }}
+{{ if .IsTranslated -}}
+<link rel="alternate" hreflang="{{ .Site.LanguageCode | default .Lang }}" href="{{ .Permalink }}" title="{{ cond .IsHome .Site.Title .LinkTitle | htmlEscape }}" />
+    {{- range .Translations }}
+<link rel="alternate" hreflang="{{ .Site.LanguageCode | default .Lang }}" href="{{ .Permalink }}" title="{{ cond .IsHome .Site.Title .LinkTitle | htmlEscape }}" />
+    {{- end -}}
 {{- end -}}
 
 {{ partial "includes-header.html" . }}
