@@ -3,7 +3,7 @@ license = "MPL 2.0"
 licenselink = "https://mozilla.org/MPL/2.0/"
 description = "Hugo theme for personal websites with academic content"
 homepage = "https://github.com/michaelroland/yet-another-academic-theme"
-min_version = "0.80"
+min_version = "0.111"
 
 [author]
   name = "Michael Roland"
