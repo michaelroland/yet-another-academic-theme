@@ -7,7 +7,7 @@
 ##  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 ## 
 
-rel = [ "alternate", "author", "bookmark", "external", "help", "license", "next", "nofollow", "noreferrer", "noopener", "prev", "tag" ]
+rel = [ "alternate", "author", "bookmark", "external", "help", "license", "me", "next", "nofollow", "noreferrer", "noopener", "prev", "tag" ]
 
 [rel_ignorable]
   "follow"   = "nofollow"
