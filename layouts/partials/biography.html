@@ -27,6 +27,7 @@ Settings:
     vcard_innerhtml
     name_pre
     name_post
+    name_as_link
     [site.Data.theme.vcard.elements.*.type]
     [site.Data.theme.vcard.elements.*.type+.secondary]
 
@@ -40,6 +41,7 @@ Page-level Params:
     biography.no_sociallinks
     biography.name_pre
     biography.name_post
+    biography.name_as_link
 
 Entry-level Params:
     portrait
@@ -56,6 +58,7 @@ Entry-level Params:
 {{- $as_biography := true -}}
 {{- $preview_pars := 0 -}}
 {{- $as_vcard := false -}}
+{{- $name_as_link := false -}}
 {{- $vcard_hide_icons := false -}}
 {{- $vcard_hide_elements := slice -}}
 {{- $no_sociallinks := false -}}
@@ -74,6 +77,9 @@ Entry-level Params:
     {{- end -}}
     {{- with .Param "biography.vcard" -}}
         {{- $as_vcard = . -}}
+    {{- end -}}
+    {{- with .Param "biography.name_as_link" -}}
+        {{- $name_as_link = . -}}
     {{- end -}}
     {{- with .Param "biography.vcard_hide_icons" -}}
         {{- $vcard_hide_icons = . -}}
@@ -106,6 +112,9 @@ Entry-level Params:
     {{- end -}}
     {{- if isset . "vcard" -}}
         {{- $as_vcard = .vcard -}}
+    {{- end -}}
+    {{- if isset . "name_as_link" -}}
+        {{- $name_as_link = .name_as_link -}}
     {{- end -}}
     {{- if isset . "vcard_hide_icons" -}}
         {{- $vcard_hide_icons = .vcard_hide_icons -}}
@@ -157,6 +166,9 @@ Entry-level Params:
     {{- end -}}
     {{- with .Page.Param "name_post" -}}
         {{- $vcard_displayname_post = . -}}
+    {{- end -}}
+    {{- if $name_as_link -}}
+        {{- $vcard_displayname = partial "render-link" (dict "Page" $.Page "Destination" .Page.RelPermalink "InnerHTML" ($vcard_displayname | htmlEscape)) -}}
     {{- end -}}
 {{- end -}}
 {{- with .Settings -}}
