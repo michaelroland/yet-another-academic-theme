@@ -63,8 +63,8 @@ Page-level Params:
     {{- $filter := . -}}
     {{- $expect_match := true -}}
     {{- $match_editor := false -}}
-    {{- if ne (.Get "author_includes_editor") "" -}}
-        {{- $match_editor = .Get "author_includes_editor" -}}
+    {{- if ne ($.Get "author_includes_editor") "" -}}
+        {{- $match_editor = $.Get "author_includes_editor" -}}
     {{- end -}}
     {{- if ne $filter "*" -}}
         {{- if eq (substr $filter 0 1) "!" -}}
