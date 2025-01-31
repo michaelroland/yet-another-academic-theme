@@ -243,11 +243,13 @@ Return: A content metadata structure that consists of
     {{- $preview_invert = .Param "preview_invert" | default $preview_invert -}}
 {{- end -}}
 {{- with .Params -}}
-    {{- with .preview_icon -}}
-        {{- $preview_icon = . -}}
-        {{- $preview_icon_width  = index $.Params "preview_icon_width"  | default 0 -}}
-        {{- $preview_icon_height = index $.Params "preview_icon_height" | default 0 -}}
-        {{- $preview_icon_alt    = index $.Params "preview_icon_alt"    | default "" -}}
+    {{- if isset . "preview_icon" -}}
+        {{- $preview_icon = .preview_icon -}}
+    {{- end -}}
+    {{- if $preview_icon -}}
+        {{- $preview_icon_width  = index . "preview_icon_width"  | default 0 -}}
+        {{- $preview_icon_height = index . "preview_icon_height" | default 0 -}}
+        {{- $preview_icon_alt    = index . "preview_icon_alt"    | default "" -}}
         {{- $preview_icon_url := $preview_icon | relURL -}}
         {{- with $.Page -}}
             {{- with .Resources.GetMatch $preview_icon -}}
@@ -259,8 +261,8 @@ Return: A content metadata structure that consists of
         {{- end -}}
         {{- $preview_icon = $preview_icon_url -}}
     {{- end -}}
-    {{- with .preview_invert -}}
-        {{- $preview_invert = . -}}
+    {{- if isset . "preview_invert" -}}
+        {{- $preview_invert = .preview_invert -}}
     {{- end -}}
 {{- end -}}
 

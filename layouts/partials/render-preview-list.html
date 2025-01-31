@@ -45,7 +45,8 @@ Page-level Params:
 
 <div class="row justify-content-start post-preview-list">
 {{- range $.Entries -}}
-    {{- $entry := partial "function-content-meta" (dict "Page" .EntryPage "Params" .Params "Settings" $.Settings) -}}
+    {{- $entry_params := merge ($.Page.Param "posts") .Params -}}
+    {{- $entry := partial "function-content-meta" (dict "Page" .EntryPage "Params" $entry_params "Settings" $.Settings) -}}
     <div class="col-12{{ with $column_classes }} {{ . }}{{ end }}">
     {{- partial $.Partial (dict "Page" $.Page "Entry" $entry "Settings" $.Settings) -}}
     </div>
